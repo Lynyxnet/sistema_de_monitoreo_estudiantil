@@ -35,7 +35,7 @@ session_start();
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav ms-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="user_admin" data-bs-toggle="dropdown" href="#"><?php echo $_SESSION['nombre'] ?></a>
+                        <a class="nav-link dropdown-toggle" id="user_admin" data-bs-toggle="dropdown" href="#"><?php echo $_SESSION['nombre']; ?></a>
                         <div class="dropdown-menu dropdown-menu-end">
                             <a href="#" class="dropdown-item">Ajustes</a>
                             <a href="cerrar_sesion.php" class="dropdown-item">Cerrar sesion</a>

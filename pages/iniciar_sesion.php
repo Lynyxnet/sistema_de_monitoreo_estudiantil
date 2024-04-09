@@ -22,8 +22,11 @@
         if(!empty($row)){
             $rol = $row[1]; //Obtener el valor del rol
             $nombre = $row[3];
+            $usuario = $row[0];
+
             $_SESSION['rol'] = $rol;
             $_SESSION['nombre'] = $nombre;
+            $_SESSION['usuario'] = $usuario;
 
             //Evaluamos el "rol" con el que se identifica el usuario
             switch($_SESSION['rol']){
