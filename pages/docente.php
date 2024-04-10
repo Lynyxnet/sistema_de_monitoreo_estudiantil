@@ -123,7 +123,7 @@ $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <input type="number" class="form-control" name="semestre" min="1" max="12" placeholder="Semestre">
               </div>
 
-              <div class="row space align-items-center justify-content-center text-center">
+              <div class="row space align-items-center justify-content-center text-center" style="margin-bottom:15px">
                 <div class="col-md-2">
                   <label for="diasInicioFin">Duracion</label>
                 </div>
@@ -135,16 +135,13 @@ $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
               </div>
 
-              <div class="space col-12">
-                <input type="file" class="form-control" name="matricula" placeholder="Sube un archivo">
-              </div>
-
             </div>
             </form>
 
           <!-- Modal footer -->
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary">Borrar</button>
+            <button type="file" name="archivo" class="btn btn-primary">Importar archivo</button>
+            <button type="button" name="borrarRegistro" class="btn btn-primary">Borrar</button>
             <button type="submit" name="submit" class="btn btn-primary">Submit</button>
           </div>
 
