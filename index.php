@@ -64,12 +64,12 @@
 
               <div class="form-group">
                 <label><span class="glyphicon glyphicon-user"></span>Correo</label>
-                <input type="text" class="form-control" id="correo" name="correo" placeholder="Ingresa tu correo">
+                <input type="text" class="form-control" id="correo" name="correo" required placeholder="Ingresa tu correo">
               </div>
 
               <div class="form-group">
                 <label><span class="glyphicon glyphicon-eye-close"></span>Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Ingresa tu password">
+                <input type="password" class="form-control" id="password" name="password" required placeholder="Ingresa tu password">
               </div>
 
               <button type="submit" value="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span>Login</button>

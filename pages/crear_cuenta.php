@@ -4,6 +4,7 @@ include_once "../db/conexion_pdo.php";
 //Datos obtenidos desde el formulario donde el usuario crea un nuevo usuario
 //mysql_real_escape_string(&_POST['...']);
 if(!empty($_POST['correo']) && !empty($_POST['password_1'])){ //Verificamos si el correo y contrasena estan seteado (si hay datos enviados)
+    //$correo = $_POST['correo'];
 
     //Con esta consulta verificamos si el usuario que vamos a crear ya existe en la base de datos
     if($stmt = $conn->prepare("SELECT * FROM usuarios WHERE correo = :correo")){ //:correo es un placeholder esperando un valor

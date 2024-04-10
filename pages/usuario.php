@@ -39,13 +39,16 @@ $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
       #user_user{
         font-weight: bold;
       }
+
+      .space {
+        margin-top: 9px;
+      }
     </style>
 </head>
 <body>
 
 
 <header>
-
 <nav class="navbar navbar-expand-sm navbar-light bg-light">
     <div class="container-fluid">
     
@@ -71,9 +74,7 @@ $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="row content">
         <div class="col-sm-1 sidenav">
             <p><a class="btn btn-outline-primary">Home</a></p>
-            <p><a class="btn btn-outline-primary px-3 me-2" data-bs-toggle="modal" data-bs-target="#crearClase">Crear clase</a></p>
             <p><a class="btn btn-outline-primary">Reportes</a></p>
-            <p><a class="btn btn-outline-primary">Justificantes</a></p>
         </div>
 
         
@@ -91,49 +92,6 @@ $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </div>
         </div>
 
-
-
-    </div>
-</div>
-
-<!-- Login -->
-<div class="modal fade" id="crearClase" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content -->
-        <div class="modal-content">
-          <!-- Modal-header -->
-          <div class="modal-header" style="padding:20px 50px;">
-            <h4><span class="glyphicon glyphicon-lock">Iniciar sesion</span></h4>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-
-          <!-- Modal body -->
-          <div class="modal-body" style="40px 50px;">
-            
-          <form action="pages/iniciar_sesion.php" method="post" role="form">
-
-              <div class="form-group">
-                <label><span class="glyphicon glyphicon-user"></span>Correo</label>
-                <input type="text" class="form-control" id="correo" name="correo" placeholder="Ingresa tu correo">
-              </div>
-
-              <div class="form-group">
-                <label><span class="glyphicon glyphicon-eye-close"></span>Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Ingresa tu password">
-              </div>
-
-              <button type="submit" value="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span>Login</button>
-              
-            </form>
-
-          </div>
-
-          <!-- Modal footer -->
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-          </div>
-
-        </div>
     </div>
 </div>
 
