@@ -6,19 +6,17 @@ session_start();
 // print_r($_SESSION);
 //var_dump($_SESSION['rol']);
 //print_r($_SESSION['rol']);
+//print_r($_SESSION);
 
 //print_r($usuario = $_SESSION['usuario']);
 $usuario = $_SESSION['usuario'];
 
-//Agregar otra querie donde solo filtre los cursos que solo imparte tal maestro independientemente
-
-$sql = "SELECT * FROM materia";
+//Consulta para mostrar los cursos que le pertenecen al maestro
+$sql = "SELECT * FROM materia WHERE idUsuario = :idusuario";
 $stmt = $conn->prepare($sql);
-$stmt->execute();
+$stmt->execute([':idusuario' => $usuario]);
 // $pages = $stmt->fetchAll();
-$pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-//print_r($pages);
+$pages = $stmt->fetchAll();
 
 ?>
 
@@ -46,6 +44,10 @@ $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
       .space {
         margin-top: 9px;
       }
+
+      .b-color {
+        background-color: red;
+      }
     </style>
 </head>
 <body>
@@ -72,26 +74,29 @@ $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container-fluid text-center">
     <div class="row content">
       
-        <div class="col-sm-1 sidenav">
-            <p><a class="btn btn-outline-primary">Home</a></p>
-            <p><a class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#crearClase">Crear clase</a></p>
-            <p><a class="btn btn-outline-primary">Reportes</a></p>
-            <p><a class="btn btn-outline-primary">Justificantes</a></p>
-        </div>
-
+        <div class="row">
         
-        <div class="col-sm-11">
-          <div class="row">
-            <h3>Grupos de asistencias</h3>
-            <?php  foreach ($pages as $page): ?>
-
-              <div class="video col-2">
-                <h4> <?php echo $page['nombreMateria']; ?> </h4>
-                <a href="ver_clases.php?id=<?php echo $page['idMateria']; ?>">Ver curso</a>
+          <div class="col-sm-2">
+              <div class="col">
+                <a class="space btn btn-primary col-6">Home</a>
+                <a class="space btn btn-primary col-6" data-bs-toggle="modal" data-bs-target="#crearClase">Crear clase</a>
+                <a class="space btn btn-primary col-6">Reportes</a>
+                <a class="space btn btn-primary col-6">Justificantes</a>
               </div>
-
-            <?php endforeach; ?>
           </div>
+
+          <div class="col-sm-10">
+            <div class="row">
+              <h3>Grupos de asistencias</h3>
+              <?php  foreach ($pages as $page): ?>
+                <div class="video card col-2">
+                  <h4> <?php echo $page['nombreMateria']; ?> </h4>
+                  <a href="ver_clases.php?id=<?php echo $page['idMateria']; ?>">Ver curso</a>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+
         </div>
 
     </div>
@@ -114,16 +119,57 @@ $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <form action="crear_clase.php" method="post">
             <div class="row">
               <div class="col-12">
-                <input type="text" class="form-control" name="maestro" placeholder="Docente">
+                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="<?php echo $_SESSION['nombre'] . " " . $_SESSION['apellidoPaterno']; ?>">
               </div>
               <div class="space col-12">
-                <input type="text" class="form-control" name="nMateria" placeholder="Asignatura">
+                <input type="text" class="form-control" id="asignatura" name="asignatura" pattern="[a-zA-Z]+(\s+[a-zA-Z]+)*" placeholder="Asignatura">
               </div>
               <div class="space col-12">
-                <input type="number" class="form-control" name="semestre" min="1" max="12" placeholder="Semestre">
+                <input type="number" class="form-control" id="semestre" name="semestre" min="1" max="12" placeholder="Semestre">
               </div>
 
-              <div class="row space align-items-center justify-content-center text-center" style="margin-bottom:15px">
+              <div class="form-group space">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <label for="">Dias</label>
+                  </div>
+                <div class="col">
+                  <div class="form-inline">
+                    <div class="form-check form-check-inline">
+                      <input type="checkbox" class="form-check-input" id="checkbox1" name="L">
+                      <label class="form-check-label" for="checkbox1">L</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                      <input type="checkbox" class="form-check-input" id="checkbox2" name="Ma">
+                      <label class="form-check-label" for="checkbox2">M</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="checkbox3" name="Mi">
+                        <label class="form-check-label" for="checkbox3">M</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="checkbox4" name="J">
+                        <label class="form-check-label" for="checkbox4">J</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="checkbox5" name="V">
+                        <label class="form-check-label" for="checkbox5">V</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                      <input type="checkbox" class="form-check-input" id="checkbox6" name="S">
+                      <label class="form-check-label" for="checkbox6">S</label>
+                    </div>
+                  </div>
+                </div>
+                </div>
+              </div>
+
+              <div class="row space align-items-center">
                 <div class="col-md-2">
                   <label for="diasInicioFin">Duracion</label>
                 </div>
@@ -134,22 +180,28 @@ $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
                   <input type="date" class="form-control" name="fechaFinal" placeholder="Fecha final">
                 </div>
               </div>
-
+              
+              <div class="space col-12" style="margin-bottom:15px">
+              <input type="file" class="form-control form-control-file">
+              </div>
+          
+              <button type="submit" name="submit" class="btn btn-primary">Submit</button>
             </div>
             </form>
 
           <!-- Modal footer -->
           <div class="modal-footer">
-            <button type="file" name="archivo" class="btn btn-primary">Importar archivo</button>
             <button type="button" name="borrarRegistro" class="btn btn-primary">Borrar</button>
-            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
           </div>
 
         </div>
     </div>
 </div>
-
 </main>
+
+<footer class="bg-primary text-center text-while fixed-bottom">
+  <div class="text-center p-3">TSJZ - 2024 Copyright</div>
+</footer>
     
 </body>
 </html>

@@ -1,0 +1,12 @@
+{
+    "name": "hugo/sistema_de_monitoreo_estudiantil",
+    "authors": [
+        {
+            "name": "lynyx",
+            "email": "lynyx@gmail.com"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^2.0"
+    }
+}

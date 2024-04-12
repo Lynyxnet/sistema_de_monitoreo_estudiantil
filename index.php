@@ -47,7 +47,7 @@
 </nav>
 
 <!-- Login -->
-<div class="modal fade" id="login" role="dialog">
+<div class="modal fade was-validated" id="login" role="dialog" >
     <div class="modal-dialog">
         <!-- Modal content -->
         <div class="modal-content">
@@ -64,12 +64,16 @@
 
               <div class="form-group">
                 <label><span class="glyphicon glyphicon-user"></span>Correo</label>
-                <input type="text" class="form-control" id="correo" name="correo" required placeholder="Ingresa tu correo">
+                <input type="text" class="form-control" id="correo" name="correo" pattern="\S+@zapopan\.tecmm\.edu\.mx" title="Escribe tu correo de la universidad" placeholder="Ingresa tu correo" required>
+                <!-- <div class="valid-feedback">Valido</div>
+                <div class="invalid-feedback">Por favor llena este campo</div> -->
               </div>
 
               <div class="form-group">
                 <label><span class="glyphicon glyphicon-eye-close"></span>Password</label>
                 <input type="password" class="form-control" id="password" name="password" required placeholder="Ingresa tu password">
+                <!-- <div class="valid-feedback">Valido</div>
+                <div class="invalid-feedback">Por favor llena este campo</div> -->
               </div>
 
               <button type="submit" value="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span>Login</button>
@@ -106,7 +110,7 @@
             <form action="pages/crear_cuenta.php" method="post">
             <div class="row">
               <div class="col-12">
-                <input type="text" class="form-control" name="nombre" placeholder="Nombre">
+                <input type="text" class="form-control" name="nombre" pattern="[a-zA-Z]+(\s+[a-zA-Z]+)*" placeholder="Nombre">
               </div>
               <div class="space col-6">
                 <input type="text" class="form-control" name="apellidoPaterno" placeholder="Apellido paterno">
@@ -115,10 +119,10 @@
                 <input type="text" class="form-control" name="apellidoMaterno" placeholder="Apellido materno">
               </div>
               <div class="space col-6">
-                <input type="text" class="form-control" name="correo" placeholder="Correo electronico">
+                <input type="text" class="form-control" name="correo" pattern="\S+@zapopan\.tecmm\.edu\.mx" title="Escribe tu correo de la universidad" placeholder="Correo electronico">
               </div>
               <div class="space col-3">
-                <input type="password" class="form-control" name="password_1" placeholder="Contrasena">
+                <input type="password" class="form-control" name="password_1" pattern=".{8,}" title="Escribe 8 o mas caracteres" placeholder="Contrasena">
               </div>
               <div class="space col-3">
                 <input type="password" class="form-control" name="password_2" placeholder="Repite contrasena">
@@ -151,7 +155,6 @@
         </div>
     </div>
 </div>
-
 
 <footer class="bg-primary text-center text-while fixed-bottom">
   <div class="text-center p-3">TSJZ - 2024 Copyright</div>

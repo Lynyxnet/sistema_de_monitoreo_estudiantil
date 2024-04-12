@@ -1,0 +1,34 @@
+Cuando instalas phpspreadsheet en tu proyecto aparece un error
+
+1. error, no existe el composer.json
+R: en la consola ejecuta el comando "composer init" y le das todo "yes", y se crea el composer.json
+
+2. al instalar el phpspreadsheet con el comando "composer require phpoffice/phpspreadsheet"
+   errors en rojo en la consola de que no existe unos paquetes: gd y zip
+R: dirigite a la ruta xampp/php/php.ini > busca php.ini > abre el archivo php.ini
+   busca en el buscador la palabras gd y zip, si tiene un ";" al principio quitalos, y guarda el archivo
+   en la consola ejecuta el comando "composer require phpoffice/phpspreadsheet", y listo
+
+3. conporbar si tiene instalado el paquete "phpspreadsheet"
+   crear un archivo leer_archivo.php
+   pega este codigo dentro del archivo que creamos
+
+   <?php
+   require '../vendor/autoload.php';
+
+   use PhpOffice\PhpSpreadsheet\Spreadsheet;
+   use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+   $spreadsheet = new Spreadsheet();
+   $activeWorksheet = $spreadsheet->getActiveSheet();
+   $activeWorksheet->setCellValue('A1', 'Hello World !');
+
+   $writer = new Xlsx($spreadsheet);
+   $writer->save('hello world.xlsx');
+   ?>
+
+   guardalo y dnetro de tu proyecto aparecera un archivo llamado "helloworld.xlsx", 
+   abrelo de forma normal, y listo se abre el excel con un "Hello World!"
+
+3. Error instaling extension "Fatal error: Uncaught Error: Class "ZipArchive" not found"
+R: abrir el archivo php.ini, quitar ";" de la linea "extension=zip", guardar, reiniciar xampp
