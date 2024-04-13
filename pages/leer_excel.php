@@ -18,12 +18,11 @@ if(isset($_POST['archivoExcel'])){
   $sheetCount = count($spreadSheetArray);
 
   //Ponemos un -1 en la variable $sheetCount-1, sino contara otra fila de mas que no contiene ningun valor y saltara error 
-  for($i=1; $i<=$sheetCount-1; $i++){
-    //echo $spreadSheetArray[$i][0] . "<br>";
+  for($i=1; $i<=$sheetCount-1; $i++){ //Conteo del array obtenido del Excel
+    //echo $spreadSheetArray[$i][0] . "<br>"; //imprimir el arrays y sus valores
     //La filas seran recorridas con el for mediante la variable $i, y el valor de las columnas queda estatica en la columna 0
     $matricula = $spreadSheetArray[$i][0]; //esta variable guarda el array quien contiene lo valores de cada celda del excel obtenido mendiate el recorrido con el for(){}
     //$success = false; // Variable para controlar el éxito del insert
-
     if(!empty($matricula)){
       $query_check = "SELECT COUNT(*) FROM usuarios WHERE matricula = :matricula";
       $stmt_check = $conn->prepare($query_check);
@@ -31,14 +30,15 @@ if(isset($_POST['archivoExcel'])){
       $count = $stmt_check->fetchColumn();
 
       if($count > 0){
-        $success = false;
-        //echo "La matricula ya existe en la base de datos";
+        $success = false; //echo "La matricula ya existe en la base de datos";
       } else {
         $query_insert = "INSERT INTO usuarios (matricula) VALUES (:matricula)";
         $stmt_insert = $conn->prepare($query_insert);
           if($stmt_insert->execute([':matricula' => $matricula])){
-            $success = true;
-            //echo "Datos del excel insertado";
+            $success = true; //echo "Datos del excel insertado";
+          } else {
+            //Esto es un mensaje si hubo un error de codificacion al momento de insertar en la bd
+            echo "Error en la insersion de datos de los datos del excel";
           }
       }
       
@@ -46,6 +46,8 @@ if(isset($_POST['archivoExcel'])){
 
   }
 
+  /*Aqui verificamos si existen los usuarios sera un booleano(false), 
+     si no existe el usuario sera un booleano(true) e insertara el nuevo usuario en la tabla usuarios */
   if($success == true){
     //var_dump($success);
     echo "Datos del Excel insertado";
