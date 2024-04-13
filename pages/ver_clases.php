@@ -9,6 +9,11 @@ $stmt->execute([':idmateria' => $pageid]); //:clase es un placeholder quien espe
 $pages = $stmt->fetch();
 // print_r($pages); //imprime los valores de la query que es un array que contiene los valores traidos de la BD
 
+//debo obtener los datos mediante un inner join donde elijo las tablas con select
+//ejemplo: tabla donde se junte materia-alumno arrastro la columna idalumno,nombrealumno, matricula de la tabla alumno
+//arrastro la tabla materia, y dentro de la materia el profesor quien la imparte
+//lo dias que estara y mostrarlo en la tabla  
+
 ?>
 
 <!DOCTYPE html>
