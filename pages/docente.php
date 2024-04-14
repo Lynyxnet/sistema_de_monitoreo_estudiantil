@@ -119,7 +119,7 @@ $pages = $stmt->fetchAll();
           <form action="crear_clase.php" method="post">
             <div class="row">
               <div class="col-12">
-                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="<?php echo $_SESSION['nombre'] . " " . $_SESSION['apellidoPaterno']; ?>">
+                <input type="text" class="form-control" id="nombre" name="nombre" readonly placeholder="<?php echo $_SESSION['nombre'] . " " . $_SESSION['apellidoPaterno']; ?>">
               </div>
               <div class="space col-12">
                 <input type="text" class="form-control" id="asignatura" name="asignatura" pattern="[a-zA-Z]+(\s+[a-zA-Z]+)*" placeholder="Asignatura">
@@ -185,7 +185,7 @@ $pages = $stmt->fetchAll();
               <input type="file" name="archivoExcel" class="form-control form-control-file">
               </div>
           
-              <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" name="submit" value="submit" class="btn btn-primary">Submit</button>
             </div>
             </form>
 
