@@ -38,7 +38,7 @@ if(isset($_POST['archivoExcel'])){
             $success = true; //echo "Datos del excel insertado";
           } else {
             //Esto es un mensaje si hubo un error de codificacion al momento de insertar en la bd
-            echo "Error en la insersion de datos de los datos del excel";
+            echo "Error en la insersion en la base de datos";
           }
       }
       
@@ -47,17 +47,18 @@ if(isset($_POST['archivoExcel'])){
   }
 
   /*Aqui verificamos si existen los usuarios sera un booleano(false), 
-     si no existe el usuario sera un booleano(true) e insertara el nuevo usuario en la tabla usuarios */
+    si no existe el usuario sera un booleano(true) e insertara el nuevo usuario en la tabla usuarios */
   if($success == true){
     //var_dump($success);
-    echo "Datos del Excel insertado";
-  } elseif($success == false) {
+    echo "Exito! Datos importados insertados correctamente";
+    // echo "Exito! Datos importados insertados correctamente" . " " . $matricula;
+  } else { //elseif($succes == false)
     //var_dump($success);
-    echo "La matricula ya existe en la base de datos";
+    echo "Los usuarios ya existen en la base de datos";
   }
 
 } else {
-  echo "Problemas al importar el archivo Excel";
+  echo "No se ha cargado el archivo Excel";
 }
 
 ?>

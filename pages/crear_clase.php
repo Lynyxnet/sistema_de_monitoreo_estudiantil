@@ -7,9 +7,7 @@ session_start();
 
 $materia = $_POST['asignatura'];
 $asignatura = ucwords($materia); //Convierte a mayusculas el primer caracter de cada palabra de una cadena
-echo $asignatura;
-
-$usuario = $_SESSION['usuario'];
+print_r($_SESSION['usuario']);
 //$archivo = $_POST['archivo']; //Variable con el nombre del archivo //ejemplo.xlsx
 // otra rutina para obtener los datos d elso alumnos del archivo
 // re;iazo los isert de cada usuario para matricularlo en dicha materia
@@ -24,7 +22,7 @@ $fecha_final = $_POST['fechaFinal'];
     
     if($row > 0){
 
-        echo "<script> alert('Ya existe el curso en tu catalogo'); window.location.href='docente.php'; </script>";
+        //echo "<script> alert('Ya existe el curso en tu catalogo'); window.location.href='docente.php'; </script>";
 
     } else {
         //Crear curso
@@ -41,7 +39,7 @@ $fecha_final = $_POST['fechaFinal'];
             ':fechaFinal' => $fecha_final
         ]);
 
-        echo "<script> alert('Creado existosamente'); window.location.href='docente.php'; </script>";
+        //echo "<script> alert('Creado existosamente'); window.location.href='docente.php'; </script>";
     }
 
 ?>

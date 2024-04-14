@@ -182,7 +182,7 @@ $pages = $stmt->fetchAll();
               </div>
               
               <div class="space col-12" style="margin-bottom:15px">
-              <input type="file" class="form-control form-control-file">
+              <input type="file" name="archivoExcel" class="form-control form-control-file">
               </div>
           
               <button type="submit" name="submit" class="btn btn-primary">Submit</button>
