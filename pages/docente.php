@@ -116,7 +116,7 @@ $pages = $stmt->fetchAll();
           <!-- Modal body -->
           <div class="modal-body" style="40px 50px;">
             
-          <form action="crear_clase.php" method="post">
+          <form action="crear_clase.php" method="post" enctype="multipart/form-data">
             <div class="row">
               <div class="col-12">
                 <input type="text" class="form-control" id="nombre" name="nombre" readonly placeholder="<?php echo $_SESSION['nombre'] . " " . $_SESSION['apellidoPaterno']; ?>">
@@ -182,7 +182,7 @@ $pages = $stmt->fetchAll();
               </div>
               
               <div class="space col-12" style="margin-bottom:15px">
-              <input type="file" name="archivoExcel" class="form-control form-control-file">
+              <input type="file" name="archivoExcel" class="form-control form-control-file" accept=".xls,.xlsx">
               </div>
           
               <button type="submit" name="submit" value="submit" class="btn btn-primary">Submit</button>

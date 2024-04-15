@@ -55,7 +55,7 @@ if(!empty($_POST['correo']) && !empty($_POST['password_1'])){ //Verificamos si e
        }
     
     } else {
-      echo "Error al momento de consulta informacion!";
+      echo "Error al momento de consultar informacion!";
     }
     //$conn->close();
 
