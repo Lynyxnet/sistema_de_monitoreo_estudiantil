@@ -27,6 +27,7 @@ $pages = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="../js/limpiarDatosDocente.js"></script>
     <style>
 
       .container {
@@ -119,7 +120,7 @@ $pages = $stmt->fetchAll();
           <form action="crear_clase.php" method="post" enctype="multipart/form-data">
             <div class="row">
               <div class="col-12">
-                <input type="text" class="form-control" id="nombre" name="nombre" readonly placeholder="<?php echo $_SESSION['nombre'] . " " . $_SESSION['apellidoPaterno']; ?>">
+                <input type="text" class="form-control" id="nombre" name="nombre" readonly placeholder="<?php echo $_SESSION['nombre'] . " " . $_SESSION['apellidoPaterno'] . " " . $_SESSION['apellidoMaterno']; ?>">
               </div>
               <div class="space col-12">
                 <input type="text" class="form-control" id="asignatura" name="asignatura" pattern="[a-zA-Z]+(\s+[a-zA-Z]+)*" placeholder="Asignatura">
@@ -174,25 +175,27 @@ $pages = $stmt->fetchAll();
                   <label for="diasInicioFin">Duracion</label>
                 </div>
                 <div class="col-md-5">
-                  <input type="date" id="diasInicioFin" class="form-control" name="fechaInicio" placeholder="Fecha inicio">
+                  <input type="date" id="diasInicio" class="form-control" name="fechaInicio" placeholder="Fecha inicio">
                 </div>
                 <div class="col-md-5">
-                  <input type="date" class="form-control" name="fechaFinal" placeholder="Fecha final">
+                  <input type="date" id="diasFinal" class="form-control" name="fechaFinal" placeholder="Fecha final">
                 </div>
               </div>
               
               <div class="space col-12" style="margin-bottom:15px">
-              <input type="file" name="archivoExcel" class="form-control form-control-file" accept=".xls,.xlsx">
+              <input type="file" id="miArchivo" name="archivoExcel" class="form-control form-control-file" accept=".xls,.xlsx">
               </div>
           
-              <button type="submit" name="submit" value="submit" class="btn btn-primary">Submit</button>
+              
             </div>
-            </form>
+            
 
           <!-- Modal footer -->
           <div class="modal-footer">
-            <button type="button" name="borrarRegistro" class="btn btn-primary">Borrar</button>
+            <button type="button" onclick="limpiarDatos()" class="btn btn-primary">Borrar</button>
+            <button type="submit" id="submit" name="submit" class="btn btn-primary">Submit</button>
           </div>
+          </form>
 
         </div>
     </div>

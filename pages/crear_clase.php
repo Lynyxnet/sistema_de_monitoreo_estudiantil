@@ -48,7 +48,8 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
       //Verificar si se ha subido algun archivo  
     } elseif(empty($_FILES["archivoExcel"]["name"])){ //Si entra en la condicion es porque tiene el excel cargado, sino la condicion se rompe
       
-      echo "Por favor, selecciona un archivo para subir";
+      // echo "Por favor, selecciona un archivo para subir";
+      echo "<script> alert('Por favor, selecciona un archivo para subir'); window.location.href='docente.php'; </script>";
 
     } else {
 
@@ -64,6 +65,7 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
               echo "Lo siento, el archivo ya existe";
         }else {
             if(move_uploaded_file($_FILES["archivoExcel"]["tmp_name"], $ruta_archivo)){ //El nombre del archivo temporal de el archivo en el cual el archivo subido fue almacenado en el server
+              //echo "El archivo has sido subido correctamente";
               $archivo = $ruta_archivo;
               $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
 
@@ -71,66 +73,62 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
               $excelSheet = $spreadsheet->getActiveSheet();
               $spreadSheetArray = $excelSheet->toArray();
               $sheetCount = count($spreadSheetArray);
+              
+              //Ponemos un -1 en la variable $sheetCount-1, sino contara otra fila de mas que no contiene ningun valor y saltara error
+              for($i=9; $i<$sheetCount; $i++){ //Conteo del array obtenido del Excel
+                //Matricula Filas/Columnas
+                //echo $spreadSheetArray[$i][1] . "<br>"; //imprimir el arrays y sus valores
+                
+                //La filas seran recorridas con el for mediante la variable $i, y el valor de las columnas queda estatica en la columna 0
+                $matricula = $spreadSheetArray[$i][1]; //esta variable guarda el array quien contiene lo valores de cada celda del excel obtenido mendiate el recorrido con el for(){}
+                
+                //Nombre del alumno
+                echo $spreadSheetArray[$i][2] . "<br>";
+                
+                if(!empty($matricula)){
+                  $query_check = "SELECT COUNT(*) FROM usuarios WHERE matricula = :matricula";
+                  $stmt_check = $conn->prepare($query_check);
+                  $stmt_check->execute([':matricula' => $matricula]);
+                  $count = $stmt_check->fetchColumn();
 
-              echo $spreadSheetArray[9][1];
+                  if($count > 0){
+                    $success = false; //echo "La matricula ya existe en la base de datos";
+                  } else{
+                    $query_insert = "INSERT INTO usuarios (matricula) VALUES (:matricula)";
+                    $stmt_insert = $conn->prepare($query_insert);
+                      if($stmt_insert->execute([':matricula' => $matricula])){
+                        $success = true; //echo "Datos del excel insertado"
+                      } else {
+                        //Este es un mensaje si hubo un error de condificacion al momento de insertar en la db
+                        echo "Error en la insersion en la base datos";
+                      }
+                  }
 
-              //echo "El archivo has sido subido correctamente";
+                }
 
+              }
+
+                /*Aqui verificamos si existen los usuarios sera un booleano(false), 
+                si no existe el usuario sera un booleano(true) e insertara el nuevo usuario en la tabla usuarios */
+                if($success == true){
+                  //var_dump($success);
+                  echo "Exito! Datos importados insertados correctamente";
+                  // echo "Exito! Datos importados insertados correctamente" . " " . $matricula;
+                } else { //elseif($success == false)
+                  //var_dump($success);
+                  echo "Los usuarios ya existen en la base de datos";
+                }
+ 
             } else {
-              echo "Error al subir el archivo";
+              echo "<script> alert('Error al subir el archivo'); window.location.href='docente.php'; </script>";
             }
         }
 
       } else {
-          echo "Lo siento, solo se permiten archivos Excel";
+          echo "<script> alert('Lo siento, solo se permiten archivos Excel'); window.location.href='docente.php'; </script>";
       }
     
     } 
 
-
-
-  //   //Ponemos un -1 en la variable $sheetCount-1, sino contara otra fila de mas que no contiene ningun valor y saltara error 
-  //   for($i=1; $i<=$sheetCount-1; $i++){ //Conteo del array obtenido del Excel
-  //   //echo $spreadSheetArray[$i][0] . "<br>"; //imprimir el arrays y sus valores
-  //   //La filas seran recorridas con el for mediante la variable $i, y el valor de las columnas queda estatica en la columna 0
-  //   $matricula = $spreadSheetArray[$i][0]; //esta variable guarda el array quien contiene lo valores de cada celda del excel obtenido mendiate el recorrido con el for(){}
-  //   //$success = false; // Variable para controlar el éxito del insert
-  //   if(!empty($matricula)){
-  //     $query_check = "SELECT COUNT(*) FROM usuarios WHERE matricula = :matricula";
-  //     $stmt_check = $conn->prepare($query_check);
-  //     $stmt_check->execute([':matricula' => $matricula]);
-  //     $count = $stmt_check->fetchColumn();
-
-  //     if($count > 0){
-  //       $success = false; //echo "La matricula ya existe en la base de datos";
-  //     } else {
-  //       $query_insert = "INSERT INTO usuarios (matricula) VALUES (:matricula)";
-  //       $stmt_insert = $conn->prepare($query_insert);
-  //         if($stmt_insert->execute([':matricula' => $matricula])){
-  //           $success = true; //echo "Datos del excel insertado";
-  //         } else {
-  //           //Esto es un mensaje si hubo un error de codificacion al momento de insertar en la bd
-  //           echo "Error en la insersion en la base de datos";
-  //         }
-  //     }
-
-  // }
-
-  /*Aqui verificamos si existen los usuarios sera un booleano(false), 
-    si no existe el usuario sera un booleano(true) e insertara el nuevo usuario en la tabla usuarios */
-  // if($success == true){
-  //   //var_dump($success);
-  //   echo "Exito! Datos importados insertados correctamente";
-  //   // echo "Exito! Datos importados insertados correctamente" . " " . $matricula;
-  // } else { //elseif($succes == false)
-  //   //var_dump($success);
-  //   echo "Los usuarios ya existen en la base de datos";
-  // }
-
-// }
-
-// else {
-//     echo "Por favor, llena el formulario!";
-// }
 
 ?>
