@@ -60,7 +60,7 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
       $FileType = pathinfo($ruta_archivo, PATHINFO_EXTENSION); //Retorna la extension del archivo
       //Comprueba si el archivo es excel o no (ya sea xlsx o xls)
       if($FileType == "xlsx" || $FileType == "xls"){
-        if(file_exists($ruta_archivo)){ //Verifica si ya existe en la ruta especificada
+        if(file_exists(false)){ //Verifica si ya existe en la ruta especificada //if(file_exists($ruta_archivo))
               echo "Lo siento, el archivo ya existe";
         }else {
             if(move_uploaded_file($_FILES["archivoExcel"]["tmp_name"], $ruta_archivo)){ //El nombre del archivo temporal de el archivo en el cual el archivo subido fue almacenado en el server
@@ -72,7 +72,7 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
               $spreadSheetArray = $excelSheet->toArray();
               $sheetCount = count($spreadSheetArray);
 
-              echo $spreadSheetArray[1][0];
+              echo $spreadSheetArray[9][1];
 
               //echo "El archivo has sido subido correctamente";
 
