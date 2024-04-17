@@ -16,7 +16,6 @@ $stmt->execute([':usuario' => $usuario]);
 $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //print_r($pages);
-
 ?>
 
 <!DOCTYPE html>

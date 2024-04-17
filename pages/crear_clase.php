@@ -4,6 +4,7 @@ require_once '../vendor/autoload.php';
 session_start();
 //print_r($_SESSION);
 //echo "<br>";
+
 if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferente de vacio entra en la condicional
     // var_dump($_POST['asignatura']);
     // print_r($_POST['submit']);
@@ -61,8 +62,9 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
       $FileType = pathinfo($ruta_archivo, PATHINFO_EXTENSION); //Retorna la extension del archivo
       //Comprueba si el archivo es excel o no (ya sea xlsx o xls)
       if($FileType == "xlsx" || $FileType == "xls"){
-        if(file_exists(false)){ //Verifica si ya existe en la ruta especificada //if(file_exists($ruta_archivo))
+        if(file_exists($ruta_archivo)){ //Verifica si ya existe en la ruta especificada //if(file_exists($ruta_archivo))
               echo "Lo siento, el archivo ya existe";
+              $success = false;
         }else {
             if(move_uploaded_file($_FILES["archivoExcel"]["tmp_name"], $ruta_archivo)){ //El nombre del archivo temporal de el archivo en el cual el archivo subido fue almacenado en el server
               //echo "El archivo has sido subido correctamente";
@@ -80,10 +82,14 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
                 //echo $spreadSheetArray[$i][1] . "<br>"; //imprimir el arrays y sus valores
                 
                 //La filas seran recorridas con el for mediante la variable $i, y el valor de las columnas queda estatica en la columna 0
-                $matricula = $spreadSheetArray[$i][1]; //esta variable guarda el array quien contiene lo valores de cada celda del excel obtenido mendiate el recorrido con el for(){}
+                //$matricula = $spreadSheetArray[$i][1]; //esta variable guarda el array quien contiene lo valores de cada celda del excel obtenido mendiate el recorrido con el for(){}
                 
                 //Nombre del alumno
-                echo $spreadSheetArray[$i][2] . "<br>";
+                // echo $spreadSheetArray[$i][2] . "<br>";
+
+                // echo $spreadSheetArray[9][2];
+                // var_dump(explode(" ", $spreadSheetArray[9][2]));
+                // echo "</br>";
                 
                 if(!empty($matricula)){
                   $query_check = "SELECT COUNT(*) FROM usuarios WHERE matricula = :matricula";
@@ -108,16 +114,16 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
 
               }
 
-                /*Aqui verificamos si existen los usuarios sera un booleano(false), 
-                si no existe el usuario sera un booleano(true) e insertara el nuevo usuario en la tabla usuarios */
-                if($success == true){
-                  //var_dump($success);
-                  echo "Exito! Datos importados insertados correctamente";
-                  // echo "Exito! Datos importados insertados correctamente" . " " . $matricula;
-                } else { //elseif($success == false)
-                  //var_dump($success);
-                  echo "Los usuarios ya existen en la base de datos";
-                }
+                  /*Aqui verificamos si existen los usuarios sera un booleano(false), 
+                  si no existe el usuario sera un booleano(true) e insertara el nuevo usuario en la tabla usuarios */
+                  if($success == true){
+                    //var_dump($success);
+                    echo "Exito! Datos importados insertados correctamente";
+                    // echo "Exito! Datos importados insertados correctamente" . " " . $matricula;
+                  }   else { //elseif($success == false)
+                    //var_dump($success);
+                    echo "Los usuarios ya existen en la base de datos";
+                  }
  
             } else {
               echo "<script> alert('Error al subir el archivo'); window.location.href='docente.php'; </script>";
