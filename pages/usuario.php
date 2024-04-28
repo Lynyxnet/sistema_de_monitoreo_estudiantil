@@ -1,8 +1,8 @@
 <?php
 include_once "../db/conexion_pdo.php";
 session_start();
-//no olvidar el dato "estado" para eliminar un dato, pero queda archivado por si queremos restaurarlo
-// print_r($_SESSION);
+//No olvidar el dato "estado" para eliminar un dato, pero queda archivado por si queremos restaurarlo
+//print_r($_SESSION);
 //var_dump($_SESSION['rol']);
 //print_r($_SESSION['rol']);
 
