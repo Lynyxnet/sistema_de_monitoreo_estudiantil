@@ -20,15 +20,15 @@
 
         //Comprobamos si hay datos en la variable $row de tipo arreglo que traje por medio de fetch()
         if(!empty($row)){
+            $id_usuario = $row[0];
             $rol = $row[1]; //Obtener el valor del rol
             $nombre = $row[3];
-            $usuario = $row[0];
             $apellido_paterno = $row[4];
             $apellido_materno = $row[5]; //Guardamos el valor de $row[5] en la variable $apellido_materno
 
             $_SESSION['rol'] = $rol;
             $_SESSION['nombre'] = $nombre;
-            $_SESSION['usuario'] = $usuario;
+            $_SESSION['id_usuario'] = $id_usuario;
             $_SESSION['apellidoPaterno'] = $apellido_paterno;
             $_SESSION['apellidoMaterno'] = $apellido_materno; //Igaualamos el valor de $apellido_materno en la variable de $_SESSION['apellidoMaterno']
 

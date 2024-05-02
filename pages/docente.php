@@ -9,12 +9,12 @@ session_start();
 //print_r($_SESSION);
 
 //print_r($usuario = $_SESSION['usuario']);
-$usuario = $_SESSION['usuario'];
+$id_usuario = $_SESSION['id_usuario'];
 
 //Consulta para mostrar los cursos que le pertenecen al maestro
 $sql = "SELECT * FROM materia WHERE idUsuario = :idusuario";
 $stmt = $conn->prepare($sql);
-$stmt->execute([':idusuario' => $usuario]);
+$stmt->execute([':idusuario' => $id_usuario]);
 // $pages = $stmt->fetchAll();
 $pages = $stmt->fetchAll();
 
@@ -25,9 +25,11 @@ $pages = $stmt->fetchAll();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="../js/limpiarDatosDocente.js"></script>
+    
     <style>
 
       .container {
@@ -50,6 +52,7 @@ $pages = $stmt->fetchAll();
         background-color: red;
       }
     </style>
+    
 </head>
 <body>
 <header>
@@ -89,7 +92,7 @@ $pages = $stmt->fetchAll();
           <div class="col-sm-10">
             <div class="row">
               <h3>Grupos de asistencias</h3>
-              <?php  foreach ($pages as $page): ?>
+              <?php foreach ($pages as $page): ?>
                 <div class="video card col-2">
                   <h4> <?php echo $page['nombreMateria']; ?> </h4>
                   <a href="ver_clases.php?id=<?php echo $page['idMateria']; ?>">Ver curso</a>
@@ -126,7 +129,7 @@ $pages = $stmt->fetchAll();
                 <input type="text" class="form-control" id="asignatura" name="asignatura" pattern="[a-zA-Z]+(\s+[a-zA-Z]+)*" placeholder="Asignatura">
               </div>
               <div class="space col-12">
-                <input type="number" class="form-control" id="semestre" name="semestre" min="1" max="12" placeholder="Semestre">
+                <input type="number" class="form-control" id="semestre" name="semestre" min="1" max="12" required placeholder="Semestre">
               </div>
 
               <div class="form-group space">
