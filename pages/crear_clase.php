@@ -10,19 +10,16 @@ $usuario = $_SESSION['id_usuario'];
 $semestre = $_POST['semestre'];
 $fecha_inicio = $_POST['fechaInicio'];
 $fecha_final = $_POST['fechaFinal'];
-$diasSeleccionados = $_POST['dias'];
 
-if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferente de vacio entra en la condicional
-
+if(!empty($materia) && !empty($materia) && !empty($_POST['dias'])){ //Si es diferente de vacio entra en la condicional
+        $diasSeleccionados = $_POST['dias'];
         //Comprobar si existe el curso
         $stmt = $conn->prepare("SELECT * FROM materia WHERE idUsuario = :idusuario AND nombreMateria = :asignatura");
         $stmt->execute([':idusuario' => $usuario, ':asignatura' => $asignatura]);
         $row = $stmt->fetch(); //Obtengo lo valores por medio del fecth y el array lo guardo en la variable $row que contiene todos los datos del usuario consultado
     
         if($row > 0){
-
-            echo "<script> alert('Ya existe el curso en tu catalogo'); window.location.href='docente.php'; </script>";
-
+            $mensajes[] = "Ya existe el curso en tu catalogo";
         } else {
             //Crear curso
             $query_insert = "INSERT INTO materia (nombreMateria, idUsuario, semestre, fechaInicio, fechaFinal)
@@ -35,65 +32,66 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
                 'fechaInicio' => $fecha_inicio,
                 'fechaFinal' => $fecha_final
             ])){
-
-            //echo "<script> alert('Creado exitosamente'); window.location.href='docente.php'; </script>";
             
-            $query_select = "SELECT idMateria, fechaInicio, fechaFinal FROM materia WHERE nombreMateria = :asignatura";
-            $stmt_select = $conn->prepare($query_select);
-            if($stmt_select->execute([':asignatura' => $asignatura])){
-                $rows = $stmt_select->fetch(PDO::FETCH_ASSOC);
+              //Insertar las fechas cuando estar disponible el curso
+              $query_select = "SELECT idMateria, fechaInicio, fechaFinal FROM materia WHERE nombreMateria = :asignatura";
+              $stmt_select = $conn->prepare($query_select);
+              if($stmt_select->execute([':asignatura' => $asignatura])){
+                  $rows = $stmt_select->fetch(PDO::FETCH_ASSOC);
             
-                $id_materia = $rows['idMateria'];
-                $fechaInicio = $rows['fechaInicio'];
-                $fechaFinal = $rows['fechaFinal'];
+                  $id_materia = $rows['idMateria'];
+                  $fechaInicio = $rows['fechaInicio'];
+                  $fechaFinal = $rows['fechaFinal'];
 
-                $fecha = array();
-                $fechaActual = new DateTime($fechaInicio);
-                $fechaFinal = new DateTime($fechaFinal);
+                  $fecha = array();
+                  $fechaActual = new DateTime($fechaInicio);
+                  $fechaFinal = new DateTime($fechaFinal);
 
-                while ($fechaActual <= $fechaFinal) { //Empieza con el inicio de la fecha actual y termina con fecha final
-                // $diaSemana = $fechaActual->format('N'); //1 (Lunes) a 7 (Domingo)
-                $diaSemana = $fechaActual->format('l'); //Obtener el nombre del dia de la semana
+                  while ($fechaActual <= $fechaFinal) { //Empieza con el inicio de la fecha actual y termina con fecha final
+                  // $diaSemana = $fechaActual->format('N'); //1 (Lunes) a 7 (Domingo)
+                  $diaSemana = $fechaActual->format('l'); //Obtener el nombre del dia de la semana
       
-                if (in_array($diaSemana, $diasSeleccionados)) {
-                  $fechaActualFormato = $fechaActual->format('Y-m-d'); // Formato día-mes-año "format(d-m-Y)"
-                  $fechas[] = array('fecha' => $fechaActualFormato, 'diaSemana' => $diaSemana); //Agregar la fecha y el dia al array de fechas disponibles
-                }
+                  if (in_array($diaSemana, $diasSeleccionados)) {
+                    $fechaActualFormato = $fechaActual->format('Y-m-d'); // Formato día-mes-año "format(d-m-Y)"
+                    $fechas[] = array('fecha' => $fechaActualFormato, 'diaSemana' => $diaSemana); //Agregar la fecha y el dia al array de fechas disponibles
+                  }
       
-                $fechaActual->modify('+1 day');
-            }
+                  $fechaActual->modify('+1 day');
+                  }
 
-            foreach ($fechas as $fecha){
-                $date = $fecha['fecha'];
-                $weekday = $fecha['diaSemana'];
+                foreach ($fechas as $fecha){
+                    $date = $fecha['fecha'];
+                    $weekday = $fecha['diaSemana'];
 
-                $query = "SELECT COUNT(*) FROM materia_dia WHERE idMateria = :id_materia AND fecha = :formato_fecha";
-                $stmt_check = $conn->prepare($query);
-                if($stmt_check->execute([':id_materia' => $id_materia, ':formato_fecha' => $date])){
-                    $rows = $stmt_check->fetchColumn();
+                    $query = "SELECT COUNT(*) FROM materia_dia WHERE idMateria = :id_materia AND fecha = :formato_fecha";
+                    $stmt_check = $conn->prepare($query);
+                    if($stmt_check->execute([':id_materia' => $id_materia, ':formato_fecha' => $date])){
+                        $rows = $stmt_check->fetchColumn();
+                    }
+
+                    if($rows > 0){
+                        echo "Ya estan registrados los dias en la materia <br>";
+                    } else {
+                        $query = "INSERT INTO materia_dia(idMateria, diaSemana, fecha)
+                        VALUES (:id_materia, :dia_semana, :formato_fecha)";
+                        $stmt = $conn->prepare($query);
+                        $stmt->execute([
+                            ':id_materia' => $id_materia,
+                            ':dia_semana' => $weekday,
+                            ':formato_fecha' => $date
+                        ]);
+                        
+                        $mensajes[] = "Creado exitosamente";
+
+                        // echo "Los dias fueron insertados correctamente" . "<br>";
+
+                        //echo "<script> alert('Creado exitosamente'); window.location.href='docente.php'; </script>";
+
+                    }
+                
                 }
 
-                if($rows > 0){
-                    echo "Ya estan registrados los dias en la materia <br>";
-                } else {
-                $query = "INSERT INTO materia_dia(idMateria, diaSemana, fecha)
-                VALUES (:id_materia, :dia_semana, :formato_fecha)";
-                $stmt = $conn->prepare($query);
-                $stmt->execute([
-                    ':id_materia' => $id_materia,
-                    ':dia_semana' => $weekday,
-                    ':formato_fecha' => $date
-                ]);
-
-                    // echo "Los dias fueron insertados correctamente" . "<br>";
-
-                    echo "<script> alert('Creado exitosamente'); window.location.href='docente.php'; </script>";
-
-                }
-
-            }
-
-            }
+              }
             }
 
             }
@@ -101,9 +99,10 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
       //Verificar si esta vacio o sino se ha subido algun archivo  
     } elseif(empty($_FILES["archivoExcel"]["name"])){ //Si entra en la condicion es porque tiene el excel cargado, sino la condicion se rompe
       
-      echo "<script> alert('Por favor, selecciona un archivo para subir'); window.location.href='docente.php'; </script>";
+      // echo "<script> alert('Por favor, selecciona un archivo para subir'); window.location.href='docente.php'; </script>";
+      $mensajes[] = "Por favor, selecciona un archivo para subir";
 
-    } else {
+      } else {
 
       //Codigo para subir y alamacenar una archivo excel en nuestra carpeta de uploads del proyecto
       $archivo_nombre_original = basename($_FILES["archivoExcel"]["name"]); //El nombre original del el archivo para subirlo
@@ -160,44 +159,38 @@ if(!empty($_POST['asignatura'] && !empty($_POST['semestre']))){ //Si es diferent
 
                   if($count > 0){
                     $success = false; //echo "La matricula ya existe en la base de datos";
-                  } else{
-
-
+                  } else {
 
                     $query_insert = "INSERT INTO usuarios (idRole, matricula, nombre, password, correo) VALUES (2, :matricula, :nombre, '12345678', :correo)";
                     $stmt_insert = $conn->prepare($query_insert);
                     if($stmt_insert->execute([':matricula' => $matricula, ':nombre' => $nombreCompleto, ':correo' => $correo_completo])){
-                        $success = true; //echo "Datos del excel insertado"
-                      } else {
+                        $mensajes = "Datos del excel insertado";
+                    } else {
                         //Este es un mensaje si hubo un error de condificacion al momento de insertar en la db
-                        echo "Error en la insersion en la base datos";
-                      }
+                        $mensajes[] = "Error en la insersion en la base datos";
+                    }
                   }
 
                 }
 
               }
-
-                  /*Aqui verificamos si existen los usuarios sera un booleano(false), 
-                  si no existe el usuario sera un booleano(true) e insertara el nuevo usuario en la tabla usuarios */
-                  if($success == true){
-                    echo "Exito! Datos importados insertados correctamente";
-                    // echo "Exito! Datos importados insertados correctamente" . " " . $matricula;
-                  }   else {
-                    echo "Los usuarios ya existen en la base de datos";
-                  }
  
             } else {
               echo "<script> alert('Error al subir el archivo'); window.location.href='docente.php'; </script>";
             }
 
-
-
       } else {
-          echo "<script> alert('Lo siento, solo se permiten archivos Excel'); window.location.href='docente.php'; </script>";
+          $mensajes[] = "Lo siento, solo se permiten archivos Excel";
       }
     
-    } 
+    }
+
+    //alert box
+    if(isset($mensajes)){
+      foreach ($mensajes as $mensaje){
+        echo "<script> alert('$mensaje'); window.location.href='docente.php' </script>";
+      }
+    }
 
 ?>
 
