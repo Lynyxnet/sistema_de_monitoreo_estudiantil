@@ -47,7 +47,7 @@
 </nav>
 
 <!-- Login -->
-<div class="modal fade was-validated" id="login" role="dialog" >
+<div class="modal fade" id="login" role="dialog" >
     <div class="modal-dialog">
         <!-- Modal content -->
         <div class="modal-content">
@@ -64,7 +64,7 @@
 
               <div class="form-group">
                 <label><span class="glyphicon glyphicon-user"></span>Correo</label>
-                <input type="text" class="form-control" id="correo" name="correo" pattern="\S+@zapopan\.tecmm\.edu\.mx" title="Escribe tu correo de la universidad" placeholder="Ingresa tu correo" required>
+                <input type="text" class="form-control" id="correo" name="correo" title="Escribe tu correo de la universidad" placeholder="Ingresa tu correo" required>
                 <!-- <div class="valid-feedback">Valido</div>
                 <div class="invalid-feedback">Por favor llena este campo</div> -->
               </div>

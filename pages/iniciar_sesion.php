@@ -2,7 +2,7 @@
     include_once "../db/conexion_pdo.php";
     session_start();
 
-    if(isset($_POST['correo']) && isset($_POST['password'])){
+    if(isset($_POST['correo']) && isset($_POST['password']) || isset($_POST['matricula'])){
    
         //correo y password enviados desde el formulario
         $correo = $_POST['correo'];

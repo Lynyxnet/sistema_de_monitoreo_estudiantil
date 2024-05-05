@@ -52,7 +52,7 @@ $pages = $stmt->fetchAll();
         background-color: red;
       }
     </style>
-    
+
 </head>
 <body>
 <header>
@@ -75,6 +75,7 @@ $pages = $stmt->fetchAll();
 </header>
 
 <main>
+
 <div class="container-fluid text-center">
     <div class="row content">
       
@@ -95,7 +96,7 @@ $pages = $stmt->fetchAll();
               <?php foreach ($pages as $page): ?>
                 <div class="video card col-2">
                   <h4> <?php echo $page['nombreMateria']; ?> </h4>
-                  <a href="ver_clases.php?id=<?php echo $page['idMateria']; ?>">Ver curso</a>
+                  <a href="ver_clase.php?id=<?php echo $page['idMateria']; ?>">Ver curso</a>
                 </div>
               <?php endforeach; ?>
             </div>
@@ -119,14 +120,14 @@ $pages = $stmt->fetchAll();
 
           <!-- Modal body -->
           <div class="modal-body" style="40px 50px;">
-            
+
           <form action="crear_clase.php" method="post" enctype="multipart/form-data">
             <div class="row">
               <div class="col-12">
                 <input type="text" class="form-control" id="nombre" name="nombre" readonly placeholder="<?php echo $_SESSION['nombre'] . " " . $_SESSION['apellidoPaterno'] . " " . $_SESSION['apellidoMaterno']; ?>">
               </div>
               <div class="space col-12">
-                <input type="text" class="form-control" id="asignatura" name="asignatura" pattern="[a-zA-Z]+(\s+[a-zA-Z]+)*" placeholder="Asignatura">
+                <input type="text" class="form-control" id="asignatura" name="asignatura" pattern="[a-zA-Z]+(\s+[a-zA-Z]+)*" placeholder="Asignatura" required>
               </div>
               <div class="space col-12">
                 <input type="number" class="form-control" id="semestre" name="semestre" min="1" max="12" required placeholder="Semestre">
@@ -140,32 +141,32 @@ $pages = $stmt->fetchAll();
                 <div class="col">
                   <div class="form-inline">
                     <div class="form-check form-check-inline">
-                      <input type="checkbox" class="form-check-input" id="checkbox1" name="L">
+                      <input type="checkbox" class="form-check-input" id="checkbox1" name="dias[]" value="Monday">
                       <label class="form-check-label" for="checkbox1">L</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                      <input type="checkbox" class="form-check-input" id="checkbox2" name="Ma">
+                      <input type="checkbox" class="form-check-input" id="checkbox2" name="dias[]" value="Tuesday">
                       <label class="form-check-label" for="checkbox2">M</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                        <input type="checkbox" class="form-check-input" id="checkbox3" name="Mi">
+                        <input type="checkbox" class="form-check-input" id="checkbox3" name="dias[]" value="Wednesday">
                         <label class="form-check-label" for="checkbox3">M</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                        <input type="checkbox" class="form-check-input" id="checkbox4" name="J">
+                        <input type="checkbox" class="form-check-input" id="checkbox4" name="dias[]" value="Thursday">
                         <label class="form-check-label" for="checkbox4">J</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                        <input type="checkbox" class="form-check-input" id="checkbox5" name="V">
+                        <input type="checkbox" class="form-check-input" id="checkbox5" name="dias[]" value="Friday">
                         <label class="form-check-label" for="checkbox5">V</label>
                     </div>
 
                     <div class="form-check form-check-inline">
-                      <input type="checkbox" class="form-check-input" id="checkbox6" name="S">
+                      <input type="checkbox" class="form-check-input" id="checkbox6" name="dias[]" value="Saturday">
                       <label class="form-check-label" for="checkbox6">S</label>
                     </div>
                   </div>
@@ -189,10 +190,8 @@ $pages = $stmt->fetchAll();
               <input type="file" id="miArchivo" name="archivoExcel" class="form-control form-control-file" accept=".xls,.xlsx">
               </div>
           
-              
             </div>
             
-
           <!-- Modal footer -->
           <div class="modal-footer">
             <button type="button" onclick="limpiarDatos()" class="btn btn-primary">Borrar</button>
@@ -203,6 +202,7 @@ $pages = $stmt->fetchAll();
         </div>
     </div>
 </div>
+
 </main>
 
 <footer class="bg-primary text-center text-while fixed-bottom">
