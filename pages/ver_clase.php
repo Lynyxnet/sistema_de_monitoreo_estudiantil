@@ -111,57 +111,60 @@ $contador = 1; //Inicializamos el contador
 <div class="container-fluid">
   <div class="row"> <!-- Dentro del row tenemos dos columnas -->
     
+    <!-- Primer div -->
     <div class="col-1 space">
-      <div class="row">
+        <div class="row">
           <div class="col">
-            <button type="button"class="btn btn-outline-success mb-2 small-column"><a href="#">Home</a></button>
+            <button type="button" class="btn btn-outline-success mb-2 small-column"><a href="#">Home</a></button>
             <button type="button" class="btn btn-outline-success mb-2 small-column"><a href="docente.php">Cursos</a></button>
             <button type="button" class="btn btn-outline-success mb-2 small-column">Reportes</button>
           </div>
-      </div>
+        </div>
     </div>
 
+    <!-- Segundo div -->
     <div class="col-11 table-container space">
-      <table class="table table-striped">
-      <thead>
-        <tr>
-          <th class="text-center">#</th>
-          <th class="text-center">Matricula</th>
-          <th class="text-center">Nombre completo</th>
-          <th colspan="6" class="text-center">Asistencias</th>
-          <th colspan="6" class="text-center">Enero</th>
-          <th colspan="1" class="text-center small-column">Asistencias</th>
-          <th colspan="1" class="text-center small-column">Faltas</th>
-        </tr>
-      </thead>
+        <table class="table table-striped">
+        <thead>
+          <tr>
+            <th class="text-center">#</th>
+            <th class="text-center">Matricula</th>
+            <th class="text-center">Nombre completo</th>
+            <th colspan="6" class="text-center">Asistencias</th>
+            <th colspan="6" class="text-center">Enero</th>
+            <th colspan="1" class="text-center small-column">Asistencias</th>
+           <th colspan="1" class="text-center small-column">Faltas</th>
+          </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($results as $result): ?> <!--- inicio del foreach --->
+          <tr>
+            <td class="text-center"> <?php echo $contador; ?></td> <!--- Mostramos el contador --->
+            <td class="text-center"> <?php echo $result['matricula']; ?> </td>
+            <td> <?php echo $result['nombre'] ?> </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <?php $contador++; ?> <!--- //Incrementamos el contador para siguiente fila --->
+          <?php endforeach; ?> <!--- final del foreach --->
+          </tbody>
 
-      <tbody>
-      <?php foreach ($results as $result): ?> <!--- inicio del foreach --->
-        <tr>
-          <td class="text-center"> <?php echo $contador; ?></td> <!--- Mostramos el contador --->
-          <td class="text-center"> <?php echo $result['matricula']; ?> </td>
-          <td> <?php echo $result['nombre'] ?> </td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-      <?php $contador++; ?> <!--- //Incrementamos el contador para siguiente fila --->
-      <?php endforeach; ?> <!--- final del foreach --->
-      </tbody>
-
-      </table>
+          </table>
     </div>
+
+  </div> 
 </div>
 
 <!-- Modal - Editar alumnos -->

@@ -42,7 +42,7 @@ if(isset($_SESSION['mensajes'])){
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="../js/limpiarDatosDocente.js"></script>
     <script src="../js/OcultarAlertBox.js"></script>
-    
+    <link rel="stylesheet" href="../css/docente.css">
     <style>
 
       .container {
@@ -90,35 +90,63 @@ if(isset($_SESSION['mensajes'])){
 </header>
 
 <main>
-<div class="container-fluid text-center">
-    <div class="row content">
-      
-        <div class="row">
-        
-          <div class="col-sm-2">
-              <div class="col">
-                <a class="space btn btn-primary col-6">Home</a>
-                <a class="space btn btn-primary col-6" data-bs-toggle="modal" data-bs-target="#crearClase">Crear clase</a>
-                <a class="space btn btn-primary col-6">Reportes</a>
-                <a class="space btn btn-primary col-6">Justificantes</a>
-              </div>
-          </div>
 
-          <div class="col-sm-10">
+<!-- Grupos de asistencia -->
+<div class="container-fluid">
+
+    <div class="row space_d">
+      <div class="col-12 text-center" style="background-color: #;">
+        <h3><strong>Grupos de asistencias</strong></h3>
+      </div>
+    </div>
+
+    <div class="row space_d" style="background-color: #;">
+
+      <!-- 1/2 columna -->
+      <div class="col-1" style="margin-left: 10px;">
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-primary mb-2 small-column_d">Home</button>
+            <button type="button" class="btn btn-primary btn-sm mb-2 small-column_d" data-bs-toggle="modal" data-bs-target="#crearClase">Crear clase</button>
+            <button type="button" class="btn btn-primary mb-2 small-column_d">Reportes</button>
+            <button type="button" class="btn btn-primary btn-sm mb-2 small-column_d text-center">Justificantes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2/2 columna -->
+      <div class="col" style="background-color: #; margin-left: 10px;">
+        
+        <div class="row" style="width: 1200px;">
+
+          <!-- Segunda columna que abarca todo -->
+          <div class="col" style="height: 400px; overflow-y: auto;">
+            
             <div class="row">
-              <h3>Grupos de asistencias</h3>
-              <?php foreach ($pages as $page): ?>
-                <div class="video card col-2">
-                  <h4> <?php echo $page['nombreMateria']; ?> </h4>
-                  <a href="ver_clase.php?id=<?php echo $page['idMateria']; ?>">Ver curso</a>
-                </div>
-              <?php endforeach; ?>
+ 
+                <?php foreach ($pages as $page): ?>
+                  <div class="col-2">
+                    <a href="ver_clase.php?id=<?php echo $page['idMateria']; ?>" class="card-link">
+                      <div class="card" style="height: 5rem;">
+                        <img class="card-img-top">
+                        <div class="card-body" style="height: 5px;">
+                          <h6 class="card-title text-center"> <?php echo $page['nombreMateria']; ?> </h6>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                <?php endforeach; ?>
+
             </div>
+
           </div>
 
         </div>
 
+      </div>
+
     </div>
+
 </div>
 
 <!-- Crear clase -->
@@ -220,7 +248,7 @@ if(isset($_SESSION['mensajes'])){
 </main>
 
 <footer class="bg-primary text-center text-while fixed-bottom">
-  <div class="text-center p-3">TSJZ - 2024 Copyright</div>
+  <div class="text-center text-white p-2">TSJZ - 2024 Copyright</div>
 </footer>
     
 </body>

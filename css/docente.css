@@ -1,0 +1,22 @@
+.space_d {
+    margin-top: 20px;
+}
+
+.small-column_d {
+    width: 100px;
+}
+
+/* Efecto hover al seleccionar el card */
+.card:hover {
+  cursor: pointer;
+  box-shadow: 0 4px 8px black;
+}
+
+.card-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.card-link:hover {
+  text-decoration: none;
+}
