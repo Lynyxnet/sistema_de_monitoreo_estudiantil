@@ -67,6 +67,7 @@ if(isset($_SESSION['mensajes'])){
     </style>
 
 </head>
+
 <body>
 
 <header>

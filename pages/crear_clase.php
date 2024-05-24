@@ -184,10 +184,13 @@ $fecha_final = $_POST['fechaFinal'];
 
                 $totalFilas = $excelSheet->getHighestRow($columna);
 
+                $asignatura = $spreadSheetArray[4][2];
+                $materia = ucwords($asignatura);
+
                 //Consultar el id de la materia
                 $query_materia = "SELECT idMateria FROM materia WHERE nombreMateria = :asignatura";
                 $stmt_materia = $conn->prepare($query_materia);
-                $stmt_materia->execute([':asignatura' => $asignatura]);
+                $stmt_materia->execute([':asignatura' => $materia]);
                 $rows = $stmt_materia->fetch(PDO::FETCH_ASSOC); //Obtenemos el id de la materia de la tabla materia
                 $id_materia = $rows['idMateria'];
 
@@ -210,7 +213,8 @@ $fecha_final = $_POST['fechaFinal'];
                     $count = $stmt_verify->fetchColumn();
   
                     if($count > 0){
-                      echo "Las matriculas ya estan relacionadas<br>";
+                      $success = 4;
+                      //$mensajes[] = "Las matriculas ya estan relacionadas";
                     } else {
                       //Relacionar la materia con el alumno en la tabla materia_alumno
                       $query_insertion = "INSERT INTO materia_alumno (idUsuario, idMateria)
@@ -221,16 +225,19 @@ $fecha_final = $_POST['fechaFinal'];
                         ':idmateria' => $id_materia
                       ]);
 
+                      $success = 5;
+                      
                     }
-
-                      echo "El alumno y materia se relaciono correctamente<br>";
-                    
+                      //$mensajes[] = "El alumno y materia se relaciono correctamente";
                   }
 
+                }
 
-
-
-              }
+                if($success == 4){
+                  $mensajes[] = "Las matriculas ya estan relacionadas";
+                } if($success == 5){
+                  $mensajes[] = "El alumno y materia se relaciono correctamente";
+                }
               
                   
             } else {
@@ -263,9 +270,9 @@ $fecha_final = $_POST['fechaFinal'];
 
     // }
 
-    //$_SESSION['mensajes'] = $mensajes; //Almacena el array de mensajes en una variable de sesion
-    //header("Location: docente.php"); //Redirige a la pagina
-    //exit(); //Asegura que el script se detenga despues de redirigir
+    $_SESSION['mensajes'] = $mensajes; //Almacena el array de mensajes en una variable de sesion
+    header("Location: docente.php"); //Redirige a la pagina
+    exit(); //Asegura que el script se detenga despues de redirigir
 
 ?>
 

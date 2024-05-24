@@ -41,43 +41,20 @@ $contador = 1; //Inicializamos el contador
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="../js/limpiarDatosDocente.js"></script>
-
-    <style>
-    td, th {border: 1px solid #dddddd;}
-
-    .container {
-        margin-top: 20px;
-    }
-
-    .navbar-brand {
-    margin-left: 25px;
-    }
-
-    #user_admin{
-    font-weight: bold;
-    }
-
-    .space {
-    margin-top: 9px;
-    }
-
-    .b-color {
-    background-color: red;
-    }
-
-    </style>
-
+    <link rel="stylesheet" href="../css/ver_clase.css">
 </head>
 <body>
 
+<div>
+<!-- Navbar -  Titulo de la pagina y profile user -->
 <header>
-<nav class="navbar navbar-expand-sm navbar-light bg-light">
+  <nav class="navbar navbar-expand-sm navbar-light wallpaper-background">
       <div class="container-fluid">
-        <div class="navbar-text" href="">Monitoreo estudiantil</div>
+        <div class="navbar-text"><a href="docente.php"><strong class="text-black">Monitoreo estudiantil</strong></a></div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav ms-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="user_admin" data-bs-toggle="dropdown" href="#"><?php echo $_SESSION['nombre']; ?></a>
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><strong class="text-black"><?php echo $_SESSION['nombre']; ?></strong></a>
                         <div class="dropdown-menu dropdown-menu-end">
                             <a href="#" class="dropdown-item">Ajustes</a>
                             <a href="cerrar_sesion.php" class="dropdown-item">Cerrar sesion</a>
@@ -86,49 +63,110 @@ $contador = 1; //Inicializamos el contador
                 </ul>
             </div>
       </div>
-</nav>
+  </nav>
 </header>
 
+<!-- Inicio del main -->
 <main>
+<!-- Titulo de la materia junto con botones (imprimir, editar alumnos) -->
+<div class="container-fluid wallpaper-sub-background">
+  <div class="row">
+    <div class="col-8 d-flex bg-warning align-items-center"><h3 class="text-center"> <?php echo $pages['nombreMateria']?></h3></div>
+    <!-- Columna anidada -->
+    <div class="col-4 d-flex align-items-center bg-warning justify-content-end">
+      <button type="button" class="btn btn-light btn-sm me-2">Imprimir</button>
+      <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#editarAlumnos">Editar alumnos</button>
+    </div>
+  </div>
+</div>
 
-<h1> <?php echo $pages['nombreMateria']?> </h1>
+<!-- Informacion del maestro y materia -->
+<div class="container-fluid wallpaper-sub-background space">
+  <div class="row">
+    <!-- Primer info input -->
+    <div class="col-3 d-flex align-items-center">
+      <strong class="me-2">Docente: </strong>
+      <input type="text" value="<?php echo $_SESSION['nombre'] . " " . $_SESSION['apellidoPaterno']; ?>" class="remove-styles-input form-control form-control-sm" disabled readonly>
+    </div>
+    <div class="col-3 d-flex align-items-center">
+      <strong class="me-2">Asignatura: </strong>
+      <input type="text" value="<?php echo $pages['nombreMateria']; ?>" class="remove-styles-input form-control form-control-sm" disabled readonly>
+    </div>
+    <div class="col-2 d-flex align-items-center">
+      <strong class="me-2">Semestre: </strong>
+      <input type="text" value="6" class="remove-styles-input form-control form-control-sm" disabled readonly>
+    </div>
+    <div class="col-2 d-flex align-items-center">
+      <strong class="me-2">Mes: </strong>
+      <input type="text" value="Enero" class="remove-styles-input form-control form-control-sm" disabled readonly>
+    </div>
+    <div class="col-1 d-flex align-items-center">
+      <strong class="me-">Año: </strong>
+      <input type="text" value="2024" class="remove-styles-input form-control form-control-sm" disabled readonly>
+    </div>
+  </div> <!--- Termino del row-->
+</div>
 
-<div class="container-fluid" style="margin-bottom: 10px;">
-    <div class="row">
-      <div class="col">
-        <button class="space btn btn-primary col-2" data-bs-toggle="modal" data-bs-target="#editarAlumnos">Editar alumnos</button>
+<!-- Botones desplegables (hombe,cursos,reportes) y lista de los alumnos -->
+<div class="container-fluid">
+  <div class="row"> <!-- Dentro del row tenemos dos columnas -->
+    
+    <div class="col-1 space">
+      <div class="row">
+          <div class="col">
+            <button type="button"class="btn btn-outline-success mb-2 small-column"><a href="#">Home</a></button>
+            <button type="button" class="btn btn-outline-success mb-2 small-column"><a href="docente.php">Cursos</a></button>
+            <button type="button" class="btn btn-outline-success mb-2 small-column">Reportes</button>
+          </div>
       </div>
+    </div>
+
+    <div class="col-11 table-container space">
+      <table class="table table-striped">
+      <thead>
+        <tr>
+          <th class="text-center">#</th>
+          <th class="text-center">Matricula</th>
+          <th class="text-center">Nombre completo</th>
+          <th colspan="6" class="text-center">Asistencias</th>
+          <th colspan="6" class="text-center">Enero</th>
+          <th colspan="1" class="text-center small-column">Asistencias</th>
+          <th colspan="1" class="text-center small-column">Faltas</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <?php foreach ($results as $result): ?> <!--- inicio del foreach --->
+        <tr>
+          <td class="text-center"> <?php echo $contador; ?></td> <!--- Mostramos el contador --->
+          <td class="text-center"> <?php echo $result['matricula']; ?> </td>
+          <td> <?php echo $result['nombre'] ?> </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      <?php $contador++; ?> <!--- //Incrementamos el contador para siguiente fila --->
+      <?php endforeach; ?> <!--- final del foreach --->
+      </tbody>
+
+      </table>
     </div>
 </div>
 
-<table class="table table-striped">
-    <tr>
-        <th>No. Orden</th>
-        <th>Matricula</th>
-        <th>Nombre completo</th>
-        <th>Mes</th>
-        <th>Niveles</th>
-        <th>Asistencias</th>
-        <th>Faltas</th>
-        <th>Justicaciones</th>
-    </tr>
-    <?php foreach ($results as $result): ?> <!--- inicio del foreach --->
-    <tr>
-        <td> <?php echo $contador; ?></td> <!--- Mostramos el contador --->
-        <td> <?php echo $result['matricula']; ?> </td>
-        <td> <?php echo $result['nombre'] ?> </td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <?php $contador++; ?> <!--- //Incrementamos el contador para siguiente fila --->
-    <?php endforeach; ?> <!--- final del foreach --->
-</table>
-
-<!-- Editar alumnos -->
-<div class="modal fade modal-lg" id="editarAlumnos" role="dialog">
+<!-- Modal - Editar alumnos -->
+<div class="text-center">
+  <div class="modal fade modal-lg" id="editarAlumnos" role="dialog">
     <div class="modal-dialog">
         <!-- Modal content -->
         <div class="modal-content">
@@ -140,13 +178,14 @@ $contador = 1; //Inicializamos el contador
 
           <form action="crear_clase.php" method="post" enctype="multipart/form-data">
           
-            <!-- Modal body -->
+            <!-- Modal body - Agregar alumnos -->
             <div class="modal-body">
 
-              <div class="container">
+              <div class="container-fluid" style="margin: 8px 0px;">
                 <div class="row">
-                  <div class="col-9">Buscar</div>
-                  <div class="col"><button type="button">Agregar alumno</button></div>
+                  <div class="col d-flex align-items-center justify-content-end">
+                    <button type="button" class="btn btn-primary btn-sm">Agregar alumno</button>
+                  </div>
                 </div>
               </div>
 
@@ -182,8 +221,8 @@ $contador = 1; //Inicializamos el contador
             
             <!-- Modal footer -->
             <div class="modal-footer">
-              <button type="button" onclick="limpiarDatos()" class="btn btn-primary">Borrar todos</button>
-              <button type="submit" id="submit" name="submit" class="btn btn-primary">Submit</button>
+              <!-- <button type="button" onclick="limpiarDatos()" class="btn btn-primary">Borrar todos</button> -->
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
 
           </form>
@@ -191,12 +230,12 @@ $contador = 1; //Inicializamos el contador
 
         </div>
     </div>
+  </div>
 </div>
-
 </main>
 
 <footer class="bg-primary text-center text-while fixed-bottom">
-  <div class="text-center p-3">TSJZ - 2024 Copyright</div>
+  <div class="text-center text-white p-2">TSJZ - 2024 Copyright</div>
 </footer>
     
 </body>

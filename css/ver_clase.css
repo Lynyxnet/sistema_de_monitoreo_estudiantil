@@ -1,0 +1,69 @@
+td, th {
+    border: 1px solid #dddddd;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+.wallpaper-background {
+    background-color: #82E0AA;
+}
+
+.wallpaper-sub-background {
+    background-color: #AED6F1;
+}
+
+/* Tamanno de la tabla asistecnia y tendra un scroll-bar para recorrer los alumnos de la lista */
+.table-container {
+  max-height: 386px;
+  overflow-y: auto;
+}
+
+/* input:text donde se le quita los estilos a los inputs */
+.remove-styles-input {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  border-color: transparent;
+  margin: 5px 0px;
+}
+
+.table thead th {
+  background-color: #d9eaf7;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navbar-brand {
+margin-left: 25px;
+}
+
+#user_admin{
+font-weight: bold;
+}
+
+/* space: es el espacio que daremos entre la tabla asistencias y titulo de la materia junto con los botones */
+.space {
+  margin-top: 10px;
+}
+
+/* sub-space:  es el espacio donde se alejara del navbar, este se usara para la informacion del maestro y materia */
+.space-info {
+  margin-top: 10px;
+}
+
+.b-color {
+background-color: red;
+}
+
+.small-column {
+  width: 100px;
+}
+
+/* Quitar estilos a los tags a quienes son los links para redirigir */
+a {
+  text-decoration: none;
+  color: inherit;
+}
