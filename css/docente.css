@@ -1,3 +1,32 @@
+.container {
+  margin-top: 20px;
+}
+
+.navbar-brand {
+  margin-left: 25px;
+}
+
+#user_admin{
+  font-weight: bold;
+}
+
+.space {
+  margin-top: 9px;
+}
+
+.b-color {
+  background-color: red;
+}
+
+.custom-card {
+width: 100%; /* Ancho personalizado */
+height: 100px; /* Altura personalizada */
+}
+
+.wallpaper-background_d {
+  background-color: #82E0AA;
+}
+
 .space_d {
     margin-top: 20px;
 }
@@ -19,4 +48,17 @@
 
 .card-link:hover {
   text-decoration: none;
+}
+
+.table thead th {
+  background-color: #d9eaf7;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Quitar estilos a los tags a quienes son los links para redirigir */
+a {
+  text-decoration: none;
+  color: inherit;
 }

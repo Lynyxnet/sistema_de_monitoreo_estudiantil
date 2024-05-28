@@ -34,7 +34,7 @@ if(!empty($_POST['correo']) && !empty($_POST['password_1'])){ //Verificamos si e
             //echo $nombre . "<br>" . $apellido_Paterno . "<br>" . $apellido_Materno . "<br>" . $matricula . "<br>" . $correo . "<br>" . $rol . "<br><br>";
      
             $query = "INSERT INTO usuarios (idRole, matricula, nombre, apellidoPaterno, apellidoMaterno, password, correo)
-            VALUES (:rol, :matricula, :nombre, :apellidoPaterno, :apellidoMaterno, :password, :correo)";
+                                    VALUES (:rol, :matricula, :nombre, :apellidoPaterno, :apellidoMaterno, :password, :correo)";
             $stmt = $conn->prepare($query);
             $stmt->execute([
             ':rol' => $rol,
