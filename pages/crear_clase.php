@@ -84,8 +84,10 @@ if (!empty($materia) && !empty($materia) && !empty($_POST['dias'])) { //Si es di
               ':formato_fecha' => $date
             ]);
           }
-          $mensajes[] = "Las fechas de la materia fueron registrados correctamente";
         }
+
+        $mensajes[] = "Las fechas de la materia fueron registrados correctamente";
+
       }
     }
   }
@@ -182,13 +184,13 @@ if (!empty($materia) && !empty($materia) && !empty($_POST['dias'])) { //Si es di
 
       $totalFilas = $excelSheet->getHighestRow($columna);
 
-      $asignatura = $spreadSheetArray[4][2];
-      $materia = ucwords($asignatura);
+      //$asignatura = $spreadSheetArray[4][2];
+      //$materia = ucwords($asignatura);
 
       //Consultar el id de la materia
       $query_materia = "SELECT idMateria FROM materia WHERE nombreMateria = :asignatura";
       $stmt_materia = $conn->prepare($query_materia);
-      $stmt_materia->execute([':asignatura' => $materia]);
+      $stmt_materia->execute([':asignatura' => $asignatura]);
       $rows = $stmt_materia->fetch(PDO::FETCH_ASSOC); //Obtenemos el id de la materia de la tabla materia
       $id_materia = $rows['idMateria'];
 

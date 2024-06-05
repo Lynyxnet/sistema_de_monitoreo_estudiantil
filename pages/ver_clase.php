@@ -14,7 +14,7 @@ $pages = $stmt->fetch(PDO::FETCH_ASSOC);
 //arrastro la tabla materia, y dentro de la materia el profesor quien la imparte
 //lo dias que estara y mostrarlo en la tabla
 
-//Mostrar los alumnos de la materia con el id que obtenemos por $_GET
+//MOSTRAR LOS ALUMNOS DE LA MATERIA CON EL ID QUE OBTENEMOS POR $_GET
 $query_datos = "SELECT usuarios.matricula, usuarios.nombre, usuarios.correo
                 FROM materia_alumno
                 INNER JOIN usuarios ON materia_alumno.idUsuario = usuarios.idUsuario
@@ -28,10 +28,16 @@ $numerosFilas = count($results);
 $contador = 1; //Inicializamos el contador
 $count = 1; //Incializamos el contador
 
+//CONSULTAR diaSemana, fecha DE LA MATERIA CON BASE EN SU ID
+$query_audit = "SELECT diaSemana, fecha FROM materia_dia WHERE idMateria = $page_id";
+$stmt_audit = $conn->prepare($query_audit);
+$stmt_audit->execute();
+$rows = $stmt_audit->fetchAll();
+
 //CONSULTAR MES MINIMO Y MES MAXIMO DE LA MATERIA
 $query_mes = "SELECT
-              MIN(DATE_FORMAT(fecha, '%b')) AS mesInicio,
-              MAX(DATE_FORMAT(fecha, '%b')) AS mesFinal,
+              DATE_FORMAT(MIN(fecha), '%b') AS mesInicio,
+              DATE_FORMAT(MAX(fecha), '%b') AS mesFinal,
               DATE_FORMAT(fecha, '%Y') AS year
               FROM materia_dia
               WHERE idMateria = :id_materia
@@ -40,10 +46,196 @@ $stmt_mes = $conn->prepare($query_mes);
 $stmt_mes->execute([':id_materia' => $page_id]);
 $meses = $stmt_mes->fetch();
 
+// INFO DE FECHAS PARA MOSTRAR ANIO INICIO Y FINAL DE LA MATERIA
 $mes_inicio = $meses['mesInicio'];
 $mes_final = $meses['mesFinal'];
 $year = $meses['year'];
+
 // FIN DE LA CONSULTA DE MES INICIO Y FINAL
+$mesInicio = date("n", strtotime($mes_inicio));
+$mesFinal = date("n", strtotime($mes_final));
+
+// TRADUCIR LOS MESES DE INGLES AL ESPANOL
+$spanishMonth = array(
+  1 => "Enero", 
+  2 => "Febrero", 
+  3 => "Marzo", 
+  4 => "Abril", 
+  5 => "Mayo", 
+  6 => "Junio",
+  7 => "Julio",
+  8 => "Agosto",
+  9 => "Septiembre",
+  10 => "Octubre",
+  11 => "Noviembre",
+  12 => "Diciembre"
+);
+
+// OBTENER EL MES ACTUAL O EL SELECCIONADO
+if (isset($_POST['mesActual'])) {
+  $mesActual = $_POST['mesActual'];
+} else {
+  $mesActual = 1; // Empezar en el mes 1 (Enero)
+}
+
+// Decrementar el mes
+if(isset($_POST['decrementarMes'])) {
+  $mesActual--;
+  if ($mesActual < $mesInicio) {
+      $mesActual = $mesFinal;
+  }
+}
+// Incrementar el mes
+if(isset($_POST['incrementarMes'])) {
+  $mesActual++;
+  if ($mesActual > $mesFinal) {
+      $mesActual = $mesInicio;
+  }
+}
+
+//OBTENER LOS DIAS DEL MES SELECCIONADO
+//INCREMENTAR LOS DIAS
+if (isset($_POST['selected_day'])) {
+  $selectedDay = $_POST['selected_day'];
+} else {
+  $selectedDay = 1; // Empezar en el dia de la semana 1 (Monday)
+}
+
+if(isset($_POST['prev_day'])){
+  $selectedDay--;
+  if($selectedDay < 1){
+     $selectedDay = 6;
+  }
+} elseif(isset($_POST['next_day'])){
+  $selectedDay++;
+  if($selectedDay > 6){
+     $selectedDay = 1;
+  }
+}
+
+// echo $mesActual;
+// echo $selectedDay;
+
+// Dia de la semana que esta siendo seleccionado
+// $WeekDaysSelected = array(1 => 'Lunes', 2 => 'Martes', 3 => 'Miercoles' , 4 => 'Jueves', 5 => 'Viernes' , 6 => 'Sabado');
+// $WeekDaysSelected[$selectedDay];
+
+$nDaysArray = [];
+$fechasArray = [];
+
+//GUARDAR E IMPORTAR LOS DIAS Y FECHAS DEL MES REGISTRADO
+foreach($rows as $fila){
+  $fecha = new DateTime($fila['fecha']);
+  if($fecha->format('n') == $mesActual){
+      if($fecha->format('N') == $selectedDay){
+      // echo "Mes: $mesActual" . " " . $fila['diaSemana'] . " " . $fila['fecha'] . "<br>";
+      // $dias_semana[$fila['diaSemana']][] = $fila['fecha'];
+
+      $date = new DateTime($fila['fecha']);
+      $nDays = $fecha->format('j'); //Convertimos la fecha en un numero del dia del mes
+      $nDaysFormat = $fecha->format('Y-m-d'); //Convertimos el dia a fecha (year-month-day)
+      // echo $nDays;
+
+      // Vamos ingresar a cada fecha del array $fechasArray[] con los $key mediante foreach
+      $fechasArray[] = $fecha->format('Y-m-d'); //Fecha con formato Y-m-d
+      $nDaysArray[] = $nDays; //Fechas con formato numero del dia del mes      
+      }
+  }
+}
+
+//INSERTAR ASISTENCIAS DE LOS ALUMNOS CON LA FECHA SELECCIONADA
+if(isset($_POST['enviar'])){
+  //VERIFICAR matrciulas[], asistencias[], fecha_seleccionada
+  if(!empty($_POST['matriculas']) && !empty($_POST['asistencias']) && !empty($_POST['fecha_seleccionada'])){
+    $matriculas = $_POST['matriculas'];
+    $asistencias = $_POST['asistencias'];
+    $fecha_seleccionada = $_POST['fecha_seleccionada'];
+   
+    foreach($asistencias as $key => $asistencia) {
+      // Convertimos la matricula en string
+      $str_matricula = (string)$key;
+  
+      // Obtenemos el idUsuario basado en la matrícula
+      $query_examine = "SELECT idUsuario FROM usuarios WHERE matricula = :matricula";
+      $stmt_examine = $conn->prepare($query_examine);
+      $stmt_examine->execute([':matricula' => $str_matricula]);
+      $rows = $stmt_examine->fetchAll(PDO::FETCH_ASSOC);
+  
+      foreach($rows as $row) {
+          $id_usuario = $row['idUsuario'];
+  
+          // Obtener el idMateriaDia basado en la materia y fecha seleccionada
+          $query_values = "SELECT idMateriaDia, diaSemana, fecha
+                           FROM materia_dia
+                           WHERE idMateria = :materia AND fecha = :fecha";
+          $stmt_values = $conn->prepare($query_values);
+          $stmt_values->execute([':materia' => $page_id, 'fecha' => $fecha_seleccionada]);
+          $row = $stmt_values->fetch(PDO::FETCH_ASSOC);
+          $id_materia_dia = $row['idMateriaDia'];
+  
+          // Verificamos si ya existe un registro de asistencia para el usuario y el día específico
+          $query_check = "SELECT * FROM asistencias
+                          WHERE idUsuario = :id_usuario 
+                          AND idMateriaDia = :id_materia_dia";
+          $stmt_check = $conn->prepare($query_check);
+          $stmt_check->execute([
+              ':id_usuario' => $id_usuario, 
+              ':id_materia_dia' => $id_materia_dia,
+          ]);
+          $exist = $stmt_check->fetch(PDO::FETCH_ASSOC);
+  
+          if ($exist) {
+              // Si ya existe un registro de asistencia, no hacemos nada
+              $success = 2;
+          } else {
+              // Insertar la nueva asistencia
+              $query_add_data = "INSERT INTO asistencias (idUsuario, idMateriaDia, asistencia)
+                                 VALUES (:id_usuario, :id_materia_dia, :asistencia)";
+              $stmt_add_data = $conn->prepare($query_add_data);
+              $stmt_add_data->execute([
+                  ':id_usuario' => $id_usuario,
+                  ':id_materia_dia' => $id_materia_dia,
+                  ':asistencia' => ($asistencia == "asistio") ? 1 : 2
+              ]);
+  
+              $success = 1;
+          }
+      }
+    }  
+
+    if($success == 1){
+      $mensajes[] = "Registro existoso";
+    } elseif($success == 2){
+      $mensajes[] = "Ya estan registrados en esta fecha!!!";
+    }
+
+  } else {
+
+    $mensajes[] = "No se envio nada, llena bien el formulario";
+
+  } //Termino de obtener las matriculas y asistencias, falto o asistio
+
+}
+
+// CONSULTAR Y MOSTRAR ASISTENCIAS
+$query_asistencia = "SELECT
+                     usuarios.matricula,
+                     asistencias.asistencia,
+                     materia_dia.diaSemana,
+                     materia_dia.fecha
+                     FROM asistencias
+                     JOIN materia_dia ON asistencias.idMateriaDia = materia_dia.idMateriaDia
+                     JOIN usuarios ON asistencias.idUsuario = usuarios.idUsuario
+                     WHERE materia_dia.idMateria = :id_materia";
+$stmt_asistencia = $conn->prepare($query_asistencia);
+$stmt_asistencia->execute([':id_materia' => $page_id]);
+$asistencias = $stmt_asistencia->fetchAll(PDO::FETCH_ASSOC);
+// echo var_dump($asistencias);
+
+$asistenciaPorFecha = [];
+foreach ($asistencias as $asistencia) {
+  $asistenciaPorMatricula[$asistencia['matricula']][$asistencia['fecha']] = $asistencia['asistencia'];
+}
 
 // ELIMINAR EL ALUMNO SELECCIONADO
 if(!empty($_POST['eliminarAlumnos'])){
@@ -80,6 +272,21 @@ if(!empty($_POST['eliminarAlumnos'])){
 
 }
 
+//TRADUCIR LOS MESES AL ESPANOL
+$spanishMonth[$mesActual];
+
+//Alert box - Mensajes en pantalla de termino de una tarea realizada
+if(isset($mensajes)){
+  //Recorre los mensajes y muestra un alert box de bootstrap para cada uno
+  foreach($mensajes as $mensaje){
+    echo "<div id='alertBox' class='alert alert-warning small text-center' role='alert'>";
+    echo "<strong>" . $mensaje . "</strong>";
+    echo "</div>";
+  }
+  unset($mensajes);
+  echo "<script> setTimeout( function(){window.location.href='ver_clase.php?id=$page_id'}, 3000); </script>";
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +301,33 @@ if(!empty($_POST['eliminarAlumnos'])){
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="../js/limpiarDatosDocente.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../css/ver_clase.css">
+    <script src="../js/OcultarAlertBox.js"></script>
+    <link rel="stylesheet" href="../css/ver_clase1.css">
+    <style>
+      .scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap; /* Para evitar que el contenido se rompa en múltiples líneas */
+        -ms-overflow-style: none;  /* Internet Explorer 10+ */
+        scrollbar-width: none;  /* Firefox */
+        cursor: grab;
+        font-size: 12px;
+        border: 1px solid;
+      }
+
+      /* Para navegadores basados en WebKit (Chrome, Safari) */
+      .scroll-container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .date-table {
+        display: inline-block; /* Asegura que la tabla no se rompa en múltiples líneas */
+      }
+
+      .date-table > th, td {
+        text-align: left;
+      }
+    </style>
 </head>
 <body>
 
@@ -119,16 +352,16 @@ if(!empty($_POST['eliminarAlumnos'])){
   </nav>
 </header>
 
-<!-- Inicio del main -->
-<main>
+<main> <!-- *** Inicio del main *** -->
+
 <!-- Titulo de la materia junto con botones (imprimir, editar alumnos) -->
 <div class="container-fluid wallpaper-sub-background">
   <div class="row">
     <div class="col-8 d-flex bg-warning align-items-center"><h3 class="text-center"> <?php echo $pages['nombreMateria']?></h3></div>
     <!-- Columna anidada -->
     <div class="col-4 d-flex align-items-center bg-warning justify-content-end">
-      <button type="button" class="btn btn-light btn-sm me-2">Imprimir</button>
-      <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#editarAlumnos">Editar alumnos</button>
+      <button type="button" class="btn btn-outline-dark btn-sm me-2">Imprimir</button>
+      <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#editarAlumnos">Editar alumnos</button>
     </div>
   </div>
 </div>
@@ -160,11 +393,12 @@ if(!empty($_POST['eliminarAlumnos'])){
   </div> <!--- Termino del row-->
 </div>
 
-<!-- Botones desplegables (home,cursos,reportes) y lista de los alumnos -->
+<!-- LISTA ALUMNOS -->
+<!-- Botones desplegables Botones(Home,cursos,reportes) y Lista de los alumnos -->
 <div class="container-fluid">
   <div class="row"> <!-- Dentro del row tenemos dos columnas -->
     
-    <!-- Primer div -->
+    <!-- Primer div (Home, cursos, reportes) -->
     <div class="col-1 space">
         <div class="row">
           <div class="col">
@@ -175,45 +409,130 @@ if(!empty($_POST['eliminarAlumnos'])){
         </div>
     </div>
 
-    <!-- Segundo div -->
+    <!-- Guardamos los dias que contiene el mes seleccionado, $numero servira para el tamano "colspan" del th -->
+    <?php $numeros = $nDaysArray ?>
+
+    <!-- Segundo div (Lista de los alumnos)-->
     <div class="col-11 table-container space">
         <table class="table table-striped">
-        <thead>
-          <tr class="text-center">
-            <th>#</th>
-            <th>Matricula</th>
-            <th>Nombre completo</th>
-            <th colspan="1">Asistencias</th>
-            <th colspan="1">Enero</th>
-            <th colspan="1">Asistio</th>
-            <th colspan="1" class="text-center small-column">Asistencias</th>
-            <th colspan="1" class="text-center small-column">Faltas</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($results as $result): ?> <!--- inicio del foreach --->
-          <tr>
-            <td class="text-center"> <?php echo $contador; ?> </td> <!--- Mostramos el contador --->
-            <td class="text-center"> <?php echo $result['matricula']; ?> </td>
-            <td> <?php echo $result['nombre'] ?> </td>
+          
+          <thead>
+          <form action="#" method="post"> <!--- Inicio del form --->
+            <tr> <!--- RECORRER MESES --->
+              <th colspan="<?php echo (count($numeros)+6); ?>" class="text-center" style="background-color: #FAF9F6;">
+                <div class="d-flex justify-content-center align-items-center"> <!--- Inicio del mes actual y cambiarlo --->
+                    <div class="form-months">
+                      
+                      <input type="hidden" name="mesActual" value="<?php echo $mesActual; ?>">
+                      <input type="hidden" name="selected_day" value="<?php echo $selectedDay; ?>">
+                      
+                      <button class="btn btn-outline-dark btn-sm" name="prev_day" id="prev"> <i class="fa-solid fa-angle-left"></i> </button>
+                      
+                      <button class="btn btn-primary btn-sm" name="decrementarMes"> <i class="fa-solid fa-angle-left"></i> </button>
+                      <div> <?php echo $spanishMonth[$mesActual]; ?> </div>
+                      <button class="btn btn-primary btn-sm" name="incrementarMes" id="next"> <i class="fa-solid fa-angle-right"></i> </button>
+                      
+                      <button class="btn btn-outline-dark btn-sm" name="next_day"> <i class="fa-solid fa-angle-right"></i> </button>
+                    
+                    </div>
+                  </div>
+              </th>
+            </tr>
+
+
+            <tr class="sticky-column text-center">
+              <th>#</th>
+              <th>Matricula</th>
+              <th>Nombre completo</th>
+
+              <!--- Columnas que despliegan los dias del mes seleccionado --->
+              <?php foreach($nDaysArray as $dias) { ?>
+                <th class='text-center'> <?php echo $dias; ?> </th>
+              <?php } ?>
+
+              <!--- Columna donde se elige el dia y se seleciona (radio button) al alumno para su asistencia --->
+              <th style="width: 130px;"> 
+              <select name="fecha_seleccionada"> 
+                <?php foreach($nDaysArray as $key => $dias) echo "<option value='$fechasArray[$key]'> $dias </option>"; ?> 
+              </select> Asistio</th>
+
+              <th>T.Asistio</th>
+              <th>T.Falto</th>
+            </tr>
+
+          </thead>
+          <tbody>
+          
+            <?php foreach ($results as $result): ?> <!--- inicio del foreach --->
+            <tr> <!--- Inicio de tr (fila) --->
+            
+              <td class="text-center"> <?php echo $contador; ?> </td> <!--- Mostramos el contador --->
+            
+              <td class="text-center" style="width: 25px;">
+              <?php echo $result['matricula']; ?> <!--- Muestra la matricula del alumno --->
+              <input type='hidden' name='matriculas[]' value='<?php echo $result['matricula']; ?>' > <!--- Guarda las matriculas seleccionadas --->
+              </td>
+
+              <!--- Muestra el nombre del alumno --->
+              <td> <?php echo $result['nombre'] ?> </td>
+
+              <!-- Dias que asistio o falto el alumno -->
+              <?php foreach ($fechasArray as $fecha) { ?>
+                <td class='text-center'>
+                  <?php
+                    if (isset($asistenciaPorMatricula[$result['matricula']][$fecha])) {
+                      $estatus  = $asistenciaPorMatricula[$result['matricula']][$fecha]; // Mostrar estado de asistencia
+                      if($estatus == 'asistio'){
+                        echo "*";
+                      } else {
+                        echo " ";
+                      }
+                    }
+
+                    // } else {
+                    //   echo '-'; // O cualquier otro valor para indicar que no asistió
+                    // }
+
+                  ?>
+                </td>
+              <?php } ?>
+
+              <!-- Tomar asistencia del alumno -->
+              <td class="text-center">
+                <!-- Opcion de ASISTIO -->
+                <input type='radio' name='asistencias[<?php echo $result['matricula']; ?>]' id="choose_yes" value='asistio'>Asistio
+                <!-- FALTO -->
+                <!-- Ponemos "Checked" la asistencia del alumno, si el profesor lo cambia, ya no tendra este valor  -->
+                <input type='radio' name='asistencias[<?php echo $result['matricula']; ?>]' value='falto' id="input-falto" checked>
+              </td>
+
+              <td></td> <!--- Total de asistencias --->
+              <td></td> <!--- Total de faltas --->
+          
             <?php $contador++; ?> <!--- //Incrementamos el contador para siguiente fila --->
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          <?php endforeach; ?> <!--- final del foreach --->
-          </tr>
+            <?php endforeach; ?> <!--- final del foreach --->
+            </tr>
+
           </tbody>
-        <tdbody>
-        </tbody>
+
+          <tfoot>
+            <tr>
+              <td colspan="<?php echo (count($numeros)+6); ?>" style="background-color: #FAF9F6;">
+                <div class="d-flex justify-content-end">
+                  <input type="button" class="btn btn-outline-dark" id="clear_radio" style="margin-right: 5px;" value="Borrar">
+                  <button type="submit" class="btn btn-success" name="enviar">Registrar</button>
+                </div>
+              </td>
+            </tr>
+          </tfoot>
+          </form> <!--- Fin del form--->
         </table>
     </div>
 
   </div> 
 </div>
 
-<!-- Modal - Dove vemos las opciones para eliminar/editar alumnos -->
+<!-- Modal - Donde vemos las opciones para eliminar/editar alumnos -->
 <div class="modal fade modal-xl" id="editarAlumnos" role="dialog" style="height: 900px;">
     <div class="modal-dialog">
         <!-- Modal content -->
@@ -250,36 +569,41 @@ if(!empty($_POST['eliminarAlumnos'])){
                 </thead>
                 <tbody style="background-color: blue;">
                 
-                <form action="#" method="post"> <!--- Inicio del form ---->
-                    <tr>
-                    <?php foreach($results as $result) { ?>
-                      <td class="text-center"> <?php echo $count; ?> </td>
-                      <td 
-                      class="text-center"> <?php echo $result['matricula'] ?>
-                      <input type='hidden' name='matriculas[]' value='<?php echo $result['matricula']; ?>' >
-                      </td>
-                      <td> <?php echo $result['nombre']; ?> </td>
-                      <td></td>
-                      <td class="text-center"><td> <?php echo $result['correo']?> 
-                      </td></td>
-                      <?php $count++;?>
-                      <td class="text-center">
-                        <!-- Boton editar -->
-                        <button type="submit" data-bs-toggle="modal" data-bs-target="#editarDatosAlumnos" data-matricula="<?php echo $result['matricula']; ?>">
-                          <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <!-- Boton para eliminar el alumno que es seleccionado al momento de dar click -->
-                        <button type="submit" name="eliminarAlumnos[<?php echo $result['matricula']; ?>]" value="eliminar">
-                          <i class="fa-solid fa-trash"></i>
-                        </button>
-                      </td>
-                    </tr>
-                    <?php } ?>
-                </form>
+          <form action="#" method="post"> <!--- Inicio del form ---->
+                <tr>
+                <?php foreach($results as $result) { ?>
 
-                </tbody>
-              </table>
-              </div>
+                  <td class="text-center"> <?php echo $count; ?> </td>
+
+                  <td class="text-center"> 
+                    <?php echo $result['matricula'] ?>
+                    <input type='hidden' name='matriculas[]' value='<?php echo $result['matricula']; ?>' >
+                  </td>
+
+                  <td> <?php echo $result['nombre']; ?> </td>
+                  <td></td> <!--- Apellido paterno --->
+                  <td></td> <!--- Apellido materno --->
+                  <td> <?php echo $result['correo']?> </td>
+                  
+                  <?php $count++;?>
+
+                  <td class="text-center">
+                    <!-- Boton editar -->
+                    <button type="submit" data-bs-toggle="modal" data-bs-target="#editarDatosAlumnos" data-matricula="<?php echo $result['matricula']; ?>">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    
+                    <!-- Boton para eliminar el alumno que es seleccionado al momento de dar click -->
+                    <button type="submit" name="eliminarAlumnos[<?php echo $result['matricula']; ?>]" value="eliminar">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </td>
+
+                </tr>
+                <?php } ?> <!--- Termino del foreach --->
+            </tbody>
+          </table>
+          </div>
  
             <!-- Modal footer -->
             <div class="modal-footer">
@@ -289,13 +613,13 @@ if(!empty($_POST['eliminarAlumnos'])){
 
             </div>
 
-          </form>
+          </form> <!--- Fin del form ---->
 
         </div>
     </div>
 </div>
 
-<!-- Sub-modal - Editar datos del alumno -->
+<!-- Sub-modal - Editar los datos del alumno -->
 
 <!-- Sub-modal - Agregar alumno a la lista de asistencia -->
 <div class="modal fade" id="agregarAlumno" role="dialog">
@@ -340,16 +664,16 @@ if(!empty($_POST['eliminarAlumnos'])){
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Limpiar</button>
         <button type="submit" id="submit" name="submit" class="btn btn-success">Aceptar</button>
       </div>
-      <form>
+      </form>
 
     </div>
   </div>
 </div>
 
-</main> <!--- Fin del main --->
+</main> <!--- *** Fin del main *** --->
 
 <footer class="bg-primary text-center text-while fixed-bottom">
-  <div class="text-center text-white p-2">TSJZ - 2024 Copyright</div>
+  <div class="text-center text-white p-1">TSJZ - 2024 Copyright</div>
 </footer>
 
 <!-- Script para cerrar el primer modal para abrir el segundo modal -->

@@ -141,14 +141,18 @@ if(isset($_SESSION['mensajes'])){
           <!-- Modal body -->
           <div class="modal-body">
 
-          <form action="crear_clase.php" method="post" enctype="multipart/form-data">
+        <form action="crear_clase.php" method="post" enctype="multipart/form-data">
+            
             <div class="row">
+              
               <div class="col-12">
                 <input type="text" class="form-control" id="nombre" name="nombre" readonly placeholder="<?php echo $_SESSION['nombre'] . " " . $_SESSION['apellidoPaterno'] . " " . $_SESSION['apellidoMaterno']; ?>">
               </div>
+              
               <div class="space col-12">
                 <input type="text" class="form-control" id="asignatura" name="asignatura" pattern="[a-zA-Z]+(\s+[a-zA-Z]+)*" placeholder="Asignatura" required>
               </div>
+              
               <div class="space col-12">
                 <input type="number" class="form-control" id="semestre" name="semestre" min="1" max="12" required placeholder="Semestre">
               </div>
@@ -207,17 +211,21 @@ if(isset($_SESSION['mensajes'])){
               </div>
               
               <div class="space col-12" style="margin-bottom:15px">
-              <input type="file" id="miArchivo" name="archivoExcel" class="form-control form-control-file" accept=".xls,.xlsx">
+                <input type="file" id="miArchivo" name="archivoExcel" class="form-control form-control-file" accept=".xls,.xlsx">
               </div>
           
-            </div>
             
-          <!-- Modal footer -->
+            </div>
+
+          </div>
+            
+            <!-- Modal footer -->
           <div class="modal-footer">
             <button type="button" onclick="limpiarDatos()" class="btn btn-secondary">Limpiar</button>
-            <button type="submit" id="submit" name="submit" class="btn btn-success">Submit</button>
+            <button type="submit" id="submit" name="submit" class="btn btn-success">Crear</button>
           </div>
-          </form>
+
+        </form>
 
         </div>
     </div>
@@ -226,8 +234,8 @@ if(isset($_SESSION['mensajes'])){
 </main> <!--- Fin del main --->
 
 <footer class="bg-primary text-center text-while fixed-bottom">
-  <div class="text-center text-white p-2">TSJZ - 2024 Copyright</div>
+  <div class="text-center text-white p-1">TSJZ - 2024 Copyright</div>
 </footer>
-</body>
 
+</body>
 </html>

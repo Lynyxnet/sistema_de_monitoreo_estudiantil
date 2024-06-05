@@ -56,13 +56,12 @@ a {
   color: inherit;
 }
 
+/* Color de fondo del titulo de la materia */
 .asignatura-color {
   background-color: #ffd700;
 }
 
-/* Modals ... - Agregar alumno */
-
-/* Tamanno de la tabla asistecnia y tendra un scroll-bar para recorrer los alumnos de la lista */
+/* Tamano de la tabla asistecnia y tendra un scroll-bar para recorrer los alumnos de la lista */
 .table-container {
   max-height: 386px;
   overflow-y: auto;
@@ -75,13 +74,33 @@ a {
   border: 1px solid #ddd;
 }
 
-td, th {
-  border: 1px solid #dddddd;
-}
-
-.table thead th {
+/* ESTILOS PARA LA FILA DE TITULOS PRINCIPAL */
+/* .table thead th { */
+.sticky-column > th {
   background-color: #d9eaf7;
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+}
+
+/* ESTILOS PARA LOS BOTONES ANT-SIG */
+.form-months > div {
+  display: inline-block;
+}
+
+/* CENTRAR LOS INPUTS CON LOS VALORES */
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+/* OCULTAR EL INPUT FALTO:CHECKED */
+#input-falto {
+  display: none;
 }

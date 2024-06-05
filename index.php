@@ -31,6 +31,7 @@
       .space {
         margin-top: 9px;
       }
+      
     </style>
     
 </head>
@@ -48,6 +49,7 @@
     </div>
 </nav>
 
+<main>
 <!-- Login -->
 <div class="modal fade" id="login" role="dialog" >
     <div class="modal-dialog">
@@ -121,7 +123,7 @@
                 <input type="text" class="form-control" name="apellidoMaterno" placeholder="Apellido materno">
               </div>
               <div class="space col-6">
-                <input type="text" class="form-control" name="correo" pattern="\S+@zapopan\.tecmm\.edu\.mx" title="Escribe tu correo de la universidad" placeholder="Correo electronico">
+                <input type="text" class="form-control" pattern="\S+@zapopan\.tecmm\.edu\.mx" name="correo" title="Escribe tu correo de la universidad" placeholder="Correo electronico">
               </div>
               <div class="space col-3">
                 <input type="password" class="form-control" name="password_1" pattern=".{8,}" title="Escribe 8 o mas caracteres" placeholder="Contrasena">
@@ -141,7 +143,7 @@
               </div>
               <div id="error"></div>
               <div class="space col-12">
-                <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" name="submit" class="btn btn-success">Crear</button>
               </div>
             </div>
             </form>
@@ -157,9 +159,10 @@
         </div>
     </div>
 </div>
+</main>
 
 <footer class="bg-primary text-center text-while fixed-bottom">
-  <div class="text-center p-3">TSJZ - 2024 Copyright</div>
+  <div class="text-center p-1">TSJZ - 2024 Copyright</div>
 </footer>
 
 </body>

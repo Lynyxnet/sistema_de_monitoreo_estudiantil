@@ -64,26 +64,4 @@ if($row > 0){
 
 } //Final del if para agregar el nuevo alumno a la materia donde nos ubicamos
 
-
-// $query_insert = "INSERT INTO usuarios(idRole, nombre, apellidoPaterno, apellidoMaterno, password, correo)";
-
-// }
-
-// si existe la matricula solo extraer el id y luego insertarlo en la tabla materia_alumno
-// registrado el alumno en usuarios, luego regitrarlo en la tabla materia_alumno
-
-/* 
-Matricula -> obtener el id del usuario bajo su matricula
-Obtener el id del materia donde va a ser agregado (el que tenia en la pagina ver_clase)
-
-la table donde se agregara sus datos son "usuarios y materia_alumnos"
-
-agregamos el en la tabla usuarios con sus datos
-
-luego obtenemos su id del usuario y lo agregamos junto con la materia relacionar
-
-y se refresca y aparece el usuario
-
-*/
-
 ?>

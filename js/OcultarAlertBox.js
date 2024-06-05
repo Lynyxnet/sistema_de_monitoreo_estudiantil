@@ -4,4 +4,4 @@ setTimeout(function(){
     alertBoxes.forEach(function(alertBox){
         alertBox.style.display = 'none'; //Oculta el div cambiando su estilo 'display' a 'none'
     });
-}, 5000) // 3000 milisegundos = 3 segundos
+}, 4000) // 3000 milisegundos = 3 segundos

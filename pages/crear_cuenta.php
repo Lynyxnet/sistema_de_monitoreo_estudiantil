@@ -49,18 +49,24 @@ if(!empty($_POST['correo']) && !empty($_POST['password_1'])){ //Verificamos si e
             //$stmt->close();
 
           } else {
+
             echo "<script> alert('Las contrasenas no son iguales, intenta de nuevo!'); window.location.href='../index.php'; </script>";
+          
           }
 
        }
     
     } else {
+      
       echo "Error al momento de consultar informacion!";
+    
     }
     //$conn->close();
 
 } else {
+
   echo "<script> alert('Error! Por favor completa el formulario'); window.location.href='../index.php'; </script>";
+
 }
 
 ?>
