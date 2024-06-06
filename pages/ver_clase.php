@@ -15,24 +15,27 @@ $pages = $stmt->fetch(PDO::FETCH_ASSOC);
 //lo dias que estara y mostrarlo en la tabla
 
 //MOSTRAR LOS ALUMNOS DE LA MATERIA CON EL ID QUE OBTENEMOS POR $_GET
-$query_datos = "SELECT usuarios.matricula, usuarios.nombre, usuarios.correo
+$query_datos = "SELECT usuarios.matricula, usuarios.nombre, usuarios.apellidoPaterno, usuarios.apellidoMaterno, usuarios.correo
                 FROM materia_alumno
                 INNER JOIN usuarios ON materia_alumno.idUsuario = usuarios.idUsuario
                 WHERE materia_alumno.idMateria = :page_id;
                 ";
-$stmt_datos = $conn->prepare($query_datos);
-$stmt_datos->execute([':page_id' => $page_id]);
-$results = $stmt_datos->fetchAll();
-$numerosFilas = count($results);
+  $stmt_datos = $conn->prepare($query_datos);
+  $stmt_datos->execute([':page_id' => $page_id]);
+  $results = $stmt_datos->fetchAll();
+  $numerosFilas = count($results);
+  // print_r($results);
 
 $contador = 1; //Inicializamos el contador
 $count = 1; //Incializamos el contador
 
 //CONSULTAR diaSemana, fecha DE LA MATERIA CON BASE EN SU ID
-$query_audit = "SELECT diaSemana, fecha FROM materia_dia WHERE idMateria = $page_id";
-$stmt_audit = $conn->prepare($query_audit);
-$stmt_audit->execute();
-$rows = $stmt_audit->fetchAll();
+$query_audit = "SELECT diaSemana, fecha 
+                FROM materia_dia 
+                WHERE idMateria = $page_id";
+  $stmt_audit = $conn->prepare($query_audit);
+  $stmt_audit->execute();
+  $rows = $stmt_audit->fetchAll();
 
 //CONSULTAR MES MINIMO Y MES MAXIMO DE LA MATERIA
 $query_mes = "SELECT
@@ -42,14 +45,14 @@ $query_mes = "SELECT
               FROM materia_dia
               WHERE idMateria = :id_materia
               ";
-$stmt_mes = $conn->prepare($query_mes);
-$stmt_mes->execute([':id_materia' => $page_id]);
-$meses = $stmt_mes->fetch();
+  $stmt_mes = $conn->prepare($query_mes);
+  $stmt_mes->execute([':id_materia' => $page_id]);
+  $meses = $stmt_mes->fetch();
 
-// INFO DE FECHAS PARA MOSTRAR ANIO INICIO Y FINAL DE LA MATERIA
-$mes_inicio = $meses['mesInicio'];
-$mes_final = $meses['mesFinal'];
-$year = $meses['year'];
+  // INFO DE FECHAS PARA MOSTRAR ANIO INICIO Y FINAL DE LA MATERIA
+  $mes_inicio = $meses['mesInicio'];
+  $mes_final = $meses['mesFinal'];
+  $year = $meses['year'];
 
 // FIN DE LA CONSULTA DE MES INICIO Y FINAL
 $mesInicio = date("n", strtotime($mes_inicio));
@@ -76,6 +79,7 @@ if (isset($_POST['mesActual'])) {
   $mesActual = $_POST['mesActual'];
 } else {
   $mesActual = 1; // Empezar en el mes 1 (Enero)
+  //$mesActual = date('n');
 }
 
 // Decrementar el mes
@@ -217,24 +221,48 @@ if(isset($_POST['enviar'])){
 
 }
 
-// CONSULTAR Y MOSTRAR ASISTENCIAS
+// CONSULTAR LA TABLA "ASISTENCIAS"
 $query_asistencia = "SELECT
-                     usuarios.matricula,
-                     asistencias.asistencia,
-                     materia_dia.diaSemana,
-                     materia_dia.fecha
+                        usuarios.matricula,
+                        asistencias.asistencia,
+                        materia_dia.diaSemana,
+                        materia_dia.fecha
                      FROM asistencias
                      JOIN materia_dia ON asistencias.idMateriaDia = materia_dia.idMateriaDia
                      JOIN usuarios ON asistencias.idUsuario = usuarios.idUsuario
                      WHERE materia_dia.idMateria = :id_materia";
-$stmt_asistencia = $conn->prepare($query_asistencia);
-$stmt_asistencia->execute([':id_materia' => $page_id]);
-$asistencias = $stmt_asistencia->fetchAll(PDO::FETCH_ASSOC);
-// echo var_dump($asistencias);
+  $stmt_asistencia = $conn->prepare($query_asistencia);
+  $stmt_asistencia->execute([':id_materia' => $page_id]);
+  $asistencias = $stmt_asistencia->fetchAll(PDO::FETCH_ASSOC);
+  // echo var_dump($asistencias);
 
-$asistenciaPorFecha = [];
-foreach ($asistencias as $asistencia) {
+// VERIFICAR SI LA TABLA ASISTENCIAS TIENE ALUMNO Y SUS ASISTENCIAS
+
+if(!empty($asistencias)){
+  //Guardar el un array asociativo la matricula y fecha
+  foreach ($asistencias as $asistencia) {
   $asistenciaPorMatricula[$asistencia['matricula']][$asistencia['fecha']] = $asistencia['asistencia'];
+  }
+
+  // Calcular total de asistencias y faltas por matrícula
+  $totalesPorMatricula = [];
+  foreach ($asistenciaPorMatricula as $matricula => $asistencias) { 
+    $totalAsistencias = 0;
+    $totalFaltas = 0;
+    foreach ($asistencias as $asistencia) {
+        if ($asistencia == 'asistio') { // Ajusta 'presente' según tus datos
+            $totalAsistencias++;
+        } else {
+            $totalFaltas++;
+        }
+    }
+    $totalesPorMatricula[$matricula] = [
+        'asistencias' => $totalAsistencias,
+        'faltas' => $totalFaltas
+    ];
+  }
+} else {
+    $msgs[] = "No hay alumno o ni asistencia"; 
 }
 
 // ELIMINAR EL ALUMNO SELECCIONADO
@@ -277,14 +305,21 @@ $spanishMonth[$mesActual];
 
 //Alert box - Mensajes en pantalla de termino de una tarea realizada
 if(isset($mensajes)){
-  //Recorre los mensajes y muestra un alert box de bootstrap para cada uno
-  foreach($mensajes as $mensaje){
-    echo "<div id='alertBox' class='alert alert-warning small text-center' role='alert'>";
-    echo "<strong>" . $mensaje . "</strong>";
-    echo "</div>";
-  }
-  unset($mensajes);
-  echo "<script> setTimeout( function(){window.location.href='ver_clase.php?id=$page_id'}, 3000); </script>";
+    //Recorre los mensajes y muestra un alert box de bootstrap para cada uno
+    foreach($mensajes as $mensaje){
+      echo "<div id='alertBox' class='alert alert-warning small text-center' role='alert'>";
+      echo "<strong>" . $mensaje . "</strong>";
+      echo "</div>";
+    }
+    unset($mensajes);
+    echo "<script> setTimeout( function(){window.location.href='ver_clase.php?id=$page_id'}, 3000); </script>";
+} elseif(isset($msgs)){
+    foreach($msgs as $msg){
+      echo "<div id='alertBox' class='alert alert-warning small text-center' role='alert'>";
+      echo "<strong>" . $msg . "</strong>";
+      echo "</div>";
+    }
+    unset($msgs);
 }
 
 ?>
@@ -402,7 +437,7 @@ if(isset($mensajes)){
     <div class="col-1 space">
         <div class="row">
           <div class="col">
-            <button type="button" class="btn btn-outline-success mb-2 small-column"><a href="#">Home</a></button>
+            <button type="button" class="btn btn-outline-success mb-2 small-column"><a href="docente.php">Home</a></button>
             <button type="button" class="btn btn-outline-success mb-2 small-column"><a href="docente.php">Cursos</a></button>
             <button type="button" class="btn btn-outline-success mb-2 small-column">Reportes</button>
           </div>
@@ -474,24 +509,25 @@ if(isset($mensajes)){
               </td>
 
               <!--- Muestra el nombre del alumno --->
-              <td> <?php echo $result['nombre'] ?> </td>
+              <td> 
+                <?php 
+                  echo $result['nombre'] . " " . $result['apellidoPaterno'] . " " . $result['apellidoMaterno'];
+                ?> 
+              </td>
 
               <!-- Dias que asistio o falto el alumno -->
               <?php foreach ($fechasArray as $fecha) { ?>
                 <td class='text-center'>
                   <?php
+                  
                     if (isset($asistenciaPorMatricula[$result['matricula']][$fecha])) {
                       $estatus  = $asistenciaPorMatricula[$result['matricula']][$fecha]; // Mostrar estado de asistencia
-                      if($estatus == 'asistio'){
-                        echo "*";
-                      } else {
-                        echo " ";
-                      }
+                        if($estatus == 'asistio'){
+                          echo "<strong>*<strong>";
+                        } else {
+                        echo "-";// Valor para indicar que no asistió
+                        }
                     }
-
-                    // } else {
-                    //   echo '-'; // O cualquier otro valor para indicar que no asistió
-                    // }
 
                   ?>
                 </td>
@@ -506,8 +542,27 @@ if(isset($mensajes)){
                 <input type='radio' name='asistencias[<?php echo $result['matricula']; ?>]' value='falto' id="input-falto" checked>
               </td>
 
-              <td></td> <!--- Total de asistencias --->
-              <td></td> <!--- Total de faltas --->
+              <td class='text-center'>
+                <?php
+                // Mostrar el total de asistencias
+                if (isset($totalesPorMatricula[$result['matricula']])) {
+                    echo $totalesPorMatricula[$result['matricula']]['asistencias'];
+                } else {
+                    echo '0';
+                }
+                ?>
+              </td>
+
+              <td class='text-center'>
+                <?php
+                // Mostrar el total de faltas
+                if (isset($totalesPorMatricula[$result['matricula']])) {
+                    echo $totalesPorMatricula[$result['matricula']]['faltas'];
+                } else {
+                    echo '0';
+                }
+                ?>
+              </td>
           
             <?php $contador++; ?> <!--- //Incrementamos el contador para siguiente fila --->
             <?php endforeach; ?> <!--- final del foreach --->
@@ -581,8 +636,8 @@ if(isset($mensajes)){
                   </td>
 
                   <td> <?php echo $result['nombre']; ?> </td>
-                  <td></td> <!--- Apellido paterno --->
-                  <td></td> <!--- Apellido materno --->
+                  <td> <?php echo $result['apellidoPaterno']; ?> </td> <!--- Apellido paterno --->
+                  <td> <?php echo $result['apellidoMaterno']; ?> </td> <!--- Apellido materno --->
                   <td> <?php echo $result['correo']?> </td>
                   
                   <?php $count++;?>

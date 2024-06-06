@@ -6,21 +6,24 @@ session_start();
 //var_dump($_SESSION['rol']);
 //print_r($_SESSION['rol']);
 
-//print_r($usuario = $_SESSION['usuario']);
 $id_usuario = $_SESSION['id_usuario']; //El id del usuario
 
-$sql = "SELECT * FROM materia WHERE idUsuario = :id_usuario";
+// CONSULTAR DATOS DEL ALUMNO-MATERIA 
+$sql = "SELECT 
+        * 
+        FROM materia_alumno 
+        WHERE idUsuario = :id_usuario";
 $stmt = $conn->prepare($sql);
 $stmt->execute([':id_usuario' => $id_usuario]);
 $pages = $stmt->fetch();
-// print_r($pages);
+//print_r($pages);
 
 //CONSULTAR materia_alumno, para obtener la materia donde esta relacionado
 //La tabla materia_alumno relaciona el alumno con la materia
 $query_select = "SELECT materia.idMateria, materia.nombreMateria 
-FROM materia_alumno
-INNER JOIN materia ON materia.idMateria = materia_alumno.idMateria
-WHERE materia_alumno.idUsuario = :id_usuario";
+                 FROM materia_alumno
+                 INNER JOIN materia ON materia.idMateria = materia_alumno.idMateria
+                 WHERE materia_alumno.idUsuario = :id_usuario";
 $stmt_select = $conn->prepare($query_select);
 $stmt_select->execute([
   'id_usuario' => $id_usuario
