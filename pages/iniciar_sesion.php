@@ -34,6 +34,9 @@
 
             //Evaluamos el "rol" con el que se identifica el usuario
             switch($_SESSION['rol']){
+                case 0: //case 0, el super admin (jefa de carrera)
+                    header('location: super_admin.php');
+                break;
                 case 1: //case 1, es un docente
                     header('location: docente.php');
                 break;

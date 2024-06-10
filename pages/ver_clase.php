@@ -15,7 +15,12 @@ $pages = $stmt->fetch(PDO::FETCH_ASSOC);
 //lo dias que estara y mostrarlo en la tabla
 
 //MOSTRAR LOS ALUMNOS DE LA MATERIA CON EL ID QUE OBTENEMOS POR $_GET
-$query_datos = "SELECT usuarios.matricula, usuarios.nombre, usuarios.apellidoPaterno, usuarios.apellidoMaterno, usuarios.correo
+$query_datos = "SELECT 
+                  usuarios.matricula, 
+                  usuarios.nombre, 
+                  usuarios.apellidoPaterno, 
+                  usuarios.apellidoMaterno, 
+                  usuarios.correo
                 FROM materia_alumno
                 INNER JOIN usuarios ON materia_alumno.idUsuario = usuarios.idUsuario
                 WHERE materia_alumno.idMateria = :page_id;
@@ -148,76 +153,141 @@ foreach($rows as $fila){
 }
 
 //INSERTAR ASISTENCIAS DE LOS ALUMNOS CON LA FECHA SELECCIONADA
-if(isset($_POST['enviar'])){
-  //VERIFICAR matrciulas[], asistencias[], fecha_seleccionada
-  if(!empty($_POST['matriculas']) && !empty($_POST['asistencias']) && !empty($_POST['fecha_seleccionada'])){
-    $matriculas = $_POST['matriculas'];
-    $asistencias = $_POST['asistencias'];
-    $fecha_seleccionada = $_POST['fecha_seleccionada'];
+if(!empty($_POST['enviar'])){
+
+  //Verificamos que boton envio la peticion "submit1"
+  if($_POST['enviar'] == 'submit1'){
+    //VERIFICAR matrciulas[], asistencias[], fecha_seleccionada
+    if(!empty($_POST['matriculas']) && !empty($_POST['asistencias']) && !empty($_POST['fecha_seleccionada'])){
+      $matriculas = $_POST['matriculas'];
+      $asistencias = $_POST['asistencias'];
+      $fecha_seleccionada = $_POST['fecha_seleccionada'];
    
-    foreach($asistencias as $key => $asistencia) {
-      // Convertimos la matricula en string
-      $str_matricula = (string)$key;
+      foreach($asistencias as $key => $asistencia) {
+        // Convertimos la matricula en string
+        $str_matricula = (string)$key;
   
-      // Obtenemos el idUsuario basado en la matrícula
-      $query_examine = "SELECT idUsuario FROM usuarios WHERE matricula = :matricula";
-      $stmt_examine = $conn->prepare($query_examine);
-      $stmt_examine->execute([':matricula' => $str_matricula]);
-      $rows = $stmt_examine->fetchAll(PDO::FETCH_ASSOC);
+        // Obtenemos el idUsuario basado en la matrícula
+        $query_examine = "SELECT idUsuario FROM usuarios WHERE matricula = :matricula";
+        $stmt_examine = $conn->prepare($query_examine);
+        $stmt_examine->execute([':matricula' => $str_matricula]);
+        $rows = $stmt_examine->fetchAll(PDO::FETCH_ASSOC);
   
-      foreach($rows as $row) {
-          $id_usuario = $row['idUsuario'];
+        foreach($rows as $row) {
+            $id_usuario = $row['idUsuario'];
   
-          // Obtener el idMateriaDia basado en la materia y fecha seleccionada
-          $query_values = "SELECT idMateriaDia, diaSemana, fecha
-                           FROM materia_dia
-                           WHERE idMateria = :materia AND fecha = :fecha";
-          $stmt_values = $conn->prepare($query_values);
-          $stmt_values->execute([':materia' => $page_id, 'fecha' => $fecha_seleccionada]);
-          $row = $stmt_values->fetch(PDO::FETCH_ASSOC);
-          $id_materia_dia = $row['idMateriaDia'];
+            // Obtener el idMateriaDia basado en la materia y fecha seleccionada
+            $query_values = "SELECT idMateriaDia, diaSemana, fecha
+                            FROM materia_dia
+                            WHERE idMateria = :materia AND fecha = :fecha";
+            $stmt_values = $conn->prepare($query_values);
+            $stmt_values->execute([':materia' => $page_id, 'fecha' => $fecha_seleccionada]);
+            $row = $stmt_values->fetch(PDO::FETCH_ASSOC);
+            $id_materia_dia = $row['idMateriaDia'];
   
-          // Verificamos si ya existe un registro de asistencia para el usuario y el día específico
-          $query_check = "SELECT * FROM asistencias
-                          WHERE idUsuario = :id_usuario 
-                          AND idMateriaDia = :id_materia_dia";
-          $stmt_check = $conn->prepare($query_check);
-          $stmt_check->execute([
-              ':id_usuario' => $id_usuario, 
-              ':id_materia_dia' => $id_materia_dia,
-          ]);
-          $exist = $stmt_check->fetch(PDO::FETCH_ASSOC);
+            // Verificamos si ya existe un registro de asistencia para el usuario y el día específico
+            $query_check = "SELECT * FROM asistencias
+                            WHERE idUsuario = :id_usuario 
+                            AND idMateriaDia = :id_materia_dia";
+            $stmt_check = $conn->prepare($query_check);
+            $stmt_check->execute([
+                ':id_usuario' => $id_usuario, 
+                ':id_materia_dia' => $id_materia_dia,
+            ]);
+            $exist = $stmt_check->fetch(PDO::FETCH_ASSOC);
   
-          if ($exist) {
-              // Si ya existe un registro de asistencia, no hacemos nada
-              $success = 2;
-          } else {
-              // Insertar la nueva asistencia
-              $query_add_data = "INSERT INTO asistencias (idUsuario, idMateriaDia, asistencia)
-                                 VALUES (:id_usuario, :id_materia_dia, :asistencia)";
-              $stmt_add_data = $conn->prepare($query_add_data);
-              $stmt_add_data->execute([
-                  ':id_usuario' => $id_usuario,
-                  ':id_materia_dia' => $id_materia_dia,
-                  ':asistencia' => ($asistencia == "asistio") ? 1 : 2
-              ]);
+            if ($exist) {
+                // Si ya existe un registro de asistencia, no hacemos nada
+                $success = 2;
+            } else {
+                // Insertar la nueva asistencia
+                $query_add_data = "INSERT INTO asistencias (idUsuario, idMateriaDia, asistencia)
+                                  VALUES (:id_usuario, :id_materia_dia, :asistencia)";
+                $stmt_add_data = $conn->prepare($query_add_data);
+                $stmt_add_data->execute([
+                    ':id_usuario' => $id_usuario,
+                    ':id_materia_dia' => $id_materia_dia,
+                    ':asistencia' => ($asistencia == "asistio") ? 1 : 2
+                ]);
   
-              $success = 1;
-          }
-      }
-    }  
+                $success = 1;
+            }
+        }
+      }  
 
-    if($success == 1){
+      if($success == 1){
       $mensajes[] = "Registro existoso";
-    } elseif($success == 2){
-      $mensajes[] = "Ya estan registrados en esta fecha!!!";
+      } elseif($success == 2){
+      $mensajes[] = "Los alumnos ya estan registrados en esta fecha!!!";
+      }
+
+  }
+
+  } elseif($_POST['enviar'] == 'submit2'){
+    
+    if(!empty($_POST['matriculas']) && !empty($_POST['editar_faltas']) && !empty($_POST['fecha_seleccionada'])){
+      $MatriculasPorFaltas = $_POST['editar_faltas'];
+      $fecha_seleccionada = $_POST['fecha_seleccionada'];
+
+      foreach($MatriculasPorFaltas as $ControlEscolar => $value){
+        $MatriculasF = $ControlEscolar;
+        // echo $MatriculasF;
+      
+        $query_findings = "SELECT 
+                          usuarios.matricula,
+                          usuarios.idUsuario,
+                          materia_dia.idMateria,
+                          materia_dia.fecha,
+                          asistencias.asistencia
+                         FROM asistencias
+                         JOIN usuarios ON asistencias.idUsuario = usuarios.idUsuario
+                         JOIN materia_dia ON asistencias.idMateriaDia = materia_dia.idMateriaDia
+                         WHERE usuarios.matricula = :matricula AND materia_dia.idMateria = :materia AND materia_dia.fecha = :fecha";
+        $stmt_findings = $conn->prepare($query_findings);
+        $stmt_findings->execute([':matricula' => $MatriculasF, 'materia' => $page_id, ':fecha' => $fecha_seleccionada]);
+        $Absences = $stmt_findings->fetchAll(PDO::FETCH_ASSOC);
+        // echo var_dump($Absences) . "<br>";
+
+        if($Absences > 0){ //Comprobar si hay rows(resultados)
+          foreach($Absences as $Absence){ //Iteramos los datos de la variable $Absences, y accedemos a los valores mediante su nombre de la columna
+            $asistencia = $Absence['asistencia'];
+            $matricula = $Absence['matricula'];
+            $idUsuarioUpdate = $Absence['idUsuario'];
+
+            if($asistencia == "asistio"){
+              $success = 3;
+              // echo "Asistio: " . $id_usuario . " " . $matricula . "<br>";
+            } elseif($asistencia == "falto") {
+              // echo "No asistio " . $matricula . "<br>";
+
+              $query_update = "UPDATE
+                                  asistencias
+                               SET 
+                                  asistencia = :asistencia
+                               WHERE 
+                                  idUsuario = :id_usuario";
+              $stmt_update = $conn->prepare($query_update);
+              $stmt_update->execute(['asistencia' => 'asistio', 'id_usuario' => $idUsuarioUpdate]);
+
+              $success = 4;
+            }
+            
+          }
+        }
+
+      }
+
+      if($success == 3){
+        $mensajes[] = "Ya tiene asistencia. Escoge otro diferente";
+        } elseif($success == 4){
+        $mensajes[] = "La falta fue actualizada";
+      }
+      
+    } else {
+      $mensajes[] = "No hay datos enviados para actualizar.";
     }
-
-  } else {
-
-    $mensajes[] = "No se envio nada, llena bien el formulario";
-
-  } //Termino de obtener las matriculas y asistencias, falto o asistio
+    
+  }
 
 }
 
@@ -239,6 +309,7 @@ $query_asistencia = "SELECT
 // VERIFICAR SI LA TABLA ASISTENCIAS TIENE ALUMNO Y SUS ASISTENCIAS
 
 if(!empty($asistencias)){
+
   //Guardar el un array asociativo la matricula y fecha
   foreach ($asistencias as $asistencia) {
   $asistenciaPorMatricula[$asistencia['matricula']][$asistencia['fecha']] = $asistencia['asistencia'];
@@ -250,19 +321,23 @@ if(!empty($asistencias)){
     $totalAsistencias = 0;
     $totalFaltas = 0;
     foreach ($asistencias as $asistencia) {
-        if ($asistencia == 'asistio') { // Ajusta 'presente' según tus datos
+        if ($asistencia == 'asistio') {
             $totalAsistencias++;
         } else {
             $totalFaltas++;
         }
     }
+    //En el array "$totalesPorMatricula" en el indice por matricula se guardan el total de asistio y falto
     $totalesPorMatricula[$matricula] = [
         'asistencias' => $totalAsistencias,
         'faltas' => $totalFaltas
     ];
   }
+
 } else {
-    $msgs[] = "No hay alumno o ni asistencia"; 
+
+  $msgs[] = "No hay alumno o ni asistencia";
+
 }
 
 // ELIMINAR EL ALUMNO SELECCIONADO
@@ -322,7 +397,6 @@ if(isset($mensajes)){
     unset($msgs);
 }
 
-
 ?>
 
 <!DOCTYPE html>
@@ -338,6 +412,7 @@ if(isset($mensajes)){
     <script src="../js/limpiarDatosDocente.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="../js/OcultarAlertBox.js"></script>
+    <script src="../js/confirmarActualizar.js"></script>
     <link rel="stylesheet" href="../css/ver_clase1.css">
     <style>
       .scroll-container {
@@ -455,7 +530,7 @@ if(isset($mensajes)){
           <thead>
           <form action="#" method="post"> <!--- Inicio del form --->
             <tr> <!--- RECORRER MESES --->
-              <th colspan="<?php echo (count($numeros)+6); ?>" class="text-center" style="background-color: #FAF9F6;">
+              <th colspan="<?php echo (count($numeros)+7); ?>" class="text-center" style="background-color: #FAF9F6;">
                 <div class="d-flex justify-content-center align-items-center"> <!--- Inicio del mes actual y cambiarlo --->
                     <div class="form-months">
                       
@@ -490,7 +565,10 @@ if(isset($mensajes)){
               <th style="width: 130px;"> 
               <select name="fecha_seleccionada"> 
                 <?php foreach($nDaysArray as $key => $dias) echo "<option value='$fechasArray[$key]'> $dias </option>"; ?> 
-              </select> Asistio</th>
+              </select> Asistio
+              </th>
+
+              <th class="text-center"><i class="fa-solid fa-user-pen"></i></th>
 
               <th>T.Asistio</th>
               <th>T.Falto</th>
@@ -505,8 +583,9 @@ if(isset($mensajes)){
               <td class="text-center"> <?php echo $contador; ?> </td> <!--- Mostramos el contador --->
             
               <td class="text-center" style="width: 25px;">
-              <?php echo $result['matricula']; ?> <!--- Muestra la matricula del alumno --->
-              <input type='hidden' name='matriculas[]' value='<?php echo $result['matricula']; ?>' > <!--- Guarda las matriculas seleccionadas --->
+                <?php echo $result['matricula']; ?> <!--- Muestra la matricula del alumno --->
+                <!-- Seleccionada la matricula se guarda -->
+                <input type='hidden' name='matriculas[]' value='<?php echo $result['matricula']; ?>' > <!--- Guarda las matriculas seleccionadas --->
               </td>
 
               <!--- Muestra el nombre del alumno --->
@@ -542,6 +621,13 @@ if(isset($mensajes)){
                 <!-- Ponemos "Checked" la asistencia del alumno, si el profesor lo cambia, ya no tendra este valor  -->
                 <input type='radio' name='asistencias[<?php echo $result['matricula']; ?>]' value='falto' id="input-falto" checked>
               </td>
+              
+              <!-- Opcion para cambiar la falta del alumno que llego por una asistencia -->
+              <td class="text-center">
+                <!-- Es un input checkbox para seleccionar el/los usuario(s) que van a cambiar su falta -->
+                 <!-- Enviamos los valores de la matricula mediante name="editar_faltas", de las matriculas que van a ser cambiados -->
+                <input type='checkbox' name='editar_faltas[<?php echo $result['matricula']; ?>]' value='CambiarFalta'>
+              </td>
 
               <td class='text-center'>
                 <?php
@@ -573,10 +659,11 @@ if(isset($mensajes)){
 
           <tfoot>
             <tr>
-              <td colspan="<?php echo (count($numeros)+6); ?>" style="background-color: #FAF9F6;">
+              <td colspan="<?php echo (count($numeros)+7); ?>" style="background-color: #FAF9F6;">
                 <div class="d-flex justify-content-end">
                   <input type="button" class="btn btn-outline-dark" id="clear_radio" style="margin-right: 5px;" value="Borrar">
-                  <button type="submit" class="btn btn-success" name="enviar">Registrar</button>
+                  <button type="submit" class="btn btn-outline-dark" style="margin-right: 5px;" name="enviar" value="submit2">Actualizar</button>
+                  <button type="submit" class="btn btn-success" name="enviar" value="submit1">Registrar</button>
                 </div>
               </td>
             </tr>

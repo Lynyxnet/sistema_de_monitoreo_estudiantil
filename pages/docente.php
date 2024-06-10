@@ -132,6 +132,7 @@ if(isset($_SESSION['mensajes'])){
     <div class="modal-dialog">
         <!-- Modal content -->
         <div class="modal-content">
+          
           <!-- Modal-header -->
           <div class="modal-header" style="padding:20px 50px;">
             <h4><span>Crear clase</span></h4>
@@ -140,9 +141,7 @@ if(isset($_SESSION['mensajes'])){
 
           <!-- Modal body -->
           <div class="modal-body">
-
         <form action="crear_clase.php" method="post" enctype="multipart/form-data">
-            
             <div class="row">
               
               <div class="col-12">
@@ -156,7 +155,8 @@ if(isset($_SESSION['mensajes'])){
               <div class="space col-12">
                 <input type="number" class="form-control" id="semestre" name="semestre" min="1" max="12" required placeholder="Semestre">
               </div>
-
+              
+              <!-- Dias (lunes, martes, miercoles, jueves, viernes, sabado) -->
               <div class="form-group space">
                 <div class="row align-items-center">
                   <div class="col-auto">
@@ -216,10 +216,9 @@ if(isset($_SESSION['mensajes'])){
           
             
             </div>
-
           </div>
-            
-            <!-- Modal footer -->
+          
+          <!-- Modal footer -->
           <div class="modal-footer">
             <button type="button" onclick="limpiarDatos()" class="btn btn-secondary">Limpiar</button>
             <button type="submit" id="submit" name="submit" class="btn btn-success">Crear</button>

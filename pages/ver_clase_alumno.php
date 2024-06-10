@@ -2,6 +2,9 @@
 include_once '../db/conexion_pdo.php';
 session_start();
 
+//id del alumno
+$id_usuario = $_SESSION['id_usuario'];
+
 //CONSULTAR INFORMACION DE LA MATERIA Y OBTENER EL ID DEL MAESTRO
 $page_id = $_GET['id'];
 $sql = "SELECT
@@ -24,47 +27,47 @@ $mes_inicio = date_format($mesInicio, 'M');
 // MES FINAL
 $mesFinal = date_create($pages['fechaFinal']);
 $mes_final = date_format($mesFinal, 'M');
-// ANIO
+// YEAR
 $year = date_format($mesInicio, 'Y');
 
 // CONSULTAR ID DEL MAESTRO
 // id del maestro
 $id_maestro = $pages['idUsuario'];
 
-$query_check = "SELECT
+  // CONSULTAR LA INFO DEL MAESTRO
+  $query_check = "SELECT
                 nombre,
                 apellidoPaterno,
                 apellidoMaterno
                 FROM usuarios
-                WHERE idUsuario = :id_maestro
-";
-$stmt_check = $conn->prepare($query_check);
-$stmt_check->execute([':id_maestro' => $id_maestro]);
-$results = $stmt_check->fetch();
-// print_r($results);
+                WHERE idUsuario = :id_maestro";
+  $stmt_check = $conn->prepare($query_check);
+  $stmt_check->execute([':id_maestro' => $id_maestro]);
+  $results = $stmt_check->fetch();
+  // print_r($results);
 
-//CONSULTAR MES MINIMO Y MES MAXIMO DE LA MATERIA
-$query_mes = "SELECT
+  //CONSULTAR MES MINIMO Y MES MAXIMO DE LA MATERIA
+  $query_mes = "SELECT
               DATE_FORMAT(MIN(fecha), '%b') AS mesInicio,
               DATE_FORMAT(MAX(fecha), '%b') AS mesFinal,
               DATE_FORMAT(fecha, '%Y') AS year
               FROM materia_dia
               WHERE idMateria = :id_materia
               ";
-$stmt_mes = $conn->prepare($query_mes);
-$stmt_mes->execute([':id_materia' => $page_id]);
-$meses = $stmt_mes->fetch();
-// print_r($meses);
+    $stmt_mes = $conn->prepare($query_mes);
+    $stmt_mes->execute([':id_materia' => $page_id]);
+    $meses = $stmt_mes->fetch();
+    // print_r($meses);
 
-$mes_inicio = $meses['mesInicio'];
-$mes_final = $meses['mesFinal'];
+    $mes_inicio = $meses['mesInicio'];
+    $mes_final = $meses['mesFinal'];
 
-// CONVERTIR EL MES INICIO Y FINAL EN NUMEROS
-$mesInicio = date("n", strtotime($mes_inicio));
-$mesFinal = date("n", strtotime($mes_final));
+    // CONVERTIR EL MES INICIO Y FINAL EN NUMEROS
+    $mesInicio = date("n", strtotime($mes_inicio));
+    $mesFinal = date("n", strtotime($mes_final));
 
-// TRADUCIR LOS MESES DE INGLES AL ESPANOL
-$spanishMonth = array(
+  // TRADUCIR LOS MESES DE INGLES AL ESPANOL
+  $spanishMonth = array(
   1 => "Enero", 
   2 => "Febrero", 
   3 => "Marzo", 
@@ -77,9 +80,9 @@ $spanishMonth = array(
   10 => "Octubre",
   11 => "Noviembre",
   12 => "Diciembre"
-);
+  );
 
-// OBTENER EL MES ACTUAL O EL SELECCIONADO
+  // OBTENER EL MES ACTUAL O EL SELECCIONADO
   if (isset($_POST['mesActual'])) {
     $mesActual = $_POST['mesActual'];
   } else {
@@ -101,6 +104,65 @@ $spanishMonth = array(
     }
   }
 
+  //OBTENER LOS DIAS DEL MES SELECCIONADO
+  //INCREMENTAR LOS DIAS
+  if (isset($_POST['selected_day'])) {
+    $selectedDay = $_POST['selected_day'];
+  } else {
+  $selectedDay = 1; // Empezar en el dia de la semana 1 (Monday)
+  }
+
+  if(isset($_POST['prev_day'])){
+    $selectedDay--;
+    if($selectedDay < 1){
+      $selectedDay = 6;
+    }
+  } elseif(isset($_POST['next_day'])){
+      $selectedDay++;
+    if($selectedDay > 6){
+      $selectedDay = 1;
+    }
+  }
+
+    //CONSULTAMOS LAS ASISTENCIAS DEL USUARIO QUE INICIO SESION
+    $query_audit = "SELECT
+                      asistencias.asistencia,
+                      materia_dia.diaSemana,
+                      materia_dia.fecha
+                    FROM asistencias
+                    JOIN materia_dia ON asistencias.idMateriaDia = materia_dia.idMateriaDia
+                    WHERE asistencias.idUsuario = :id_usuario AND materia_dia.idMateria = :id_materia";
+      $stmt_audit = $conn->prepare($query_audit);
+      $stmt_audit->execute([':id_usuario' => $id_usuario, ':id_materia' => $page_id]);
+      $outputs = $stmt_audit->fetchAll();
+      //echo var_dump($outputs);
+      //Para apaarecer los datos tiene que haber asistencia en la materia y usuario relacionado
+
+      //Desglosamos dia de la semana(index head) -> fecha con su asistencia
+      $asistenciaAlumno = [];
+      foreach($outputs as $output){
+      $dia_semana = $output['diaSemana']; //Dia de la semana
+      $fecha = $output['fecha'];
+
+      $date = new DateTime($output['fecha']);
+      $monthSelected = $date->format('n'); //Convertimos la fecha en un numero del dia del mes
+
+      $estadoAsistencia = $output['asistencia']; //Asistio o falto
+      
+      if($monthSelected == $mesActual){
+        //Indice -> fechas con su asistencia (asistio o falto)
+        $asistenciaAlumno[$dia_semana][$fecha] = $estadoAsistencia;
+      }
+
+      // foreach($asistenciaAlumno as $diaSemana => $asistenciaPorDia){
+      //   // echo $diaSemana . "<br>"; //Lunes, martes, miercoles...
+      //   foreach($asistenciaPorDia as $fecha => $estadoAsistencia){
+      //     $fecha .  " " . $estadoAsistencia . "<br>"; //fecha 0000/00/00 -> asistio/falto
+      //   }
+      // }
+      // Dia semana (lunes, martes, miercoles, jueves, viernes, sabado) = >>> fecha >>> falto o asistio
+    }
+
 //TRADUCIR LOS MESES AL ESPANOL
 $spanishMonth[$mesActual];
 
@@ -116,8 +178,8 @@ $spanishMonth[$mesActual];
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="../js/limpiarDatosDocente.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="../js/limpiarDatosDocente.js"></script>
     <script src="../js/OcultarAlertBox.js"></script>
     <link rel="stylesheet" href="../css/ver_clase1.css">
     <style>
@@ -224,8 +286,6 @@ $spanishMonth[$mesActual];
         </div>
     </div>
 
-
-
     <!-- Segundo div (Lista de los alumnos)-->
     <div class="col-11 table-container space">
         <table class="table table-striped">
@@ -240,15 +300,11 @@ $spanishMonth[$mesActual];
                       
                       <input type="hidden" name="mesActual" value="<?php echo $mesActual; ?>">
                       <input type="hidden" name="selected_day" value="<?php echo $selectedDay; ?>">
-                      
-                      <button class="btn btn-outline-dark btn-sm" name="prev_day" id="prev"> <i class="fa-solid fa-angle-left"></i> </button>
-                      
+                                            
                       <button class="btn btn-primary btn-sm" name="decrementarMes"> <i class="fa-solid fa-angle-left"></i> </button>
                       <div > <?php echo $spanishMonth[$mesActual]; ?> </div>
                       <button class="btn btn-primary btn-sm" name="incrementarMes" id="next"> <i class="fa-solid fa-angle-right"></i> </button>
-                      
-                      <button class="btn btn-outline-dark btn-sm" name="next_day"> <i class="fa-solid fa-angle-right"></i> </button>
-                    
+                                          
                     </div>
                   </div>
               </th>
@@ -266,16 +322,35 @@ $spanishMonth[$mesActual];
           </thead>
 
           <tbody>
-          
-    
-          <tr class="text-center"> <!--- Inicio de tr (fila) --->
-            <th class="text-center"></th>
-            <th class="text-center"></th>
-            <td class="text-center"></td>
-            <td class="text-center"></td>
-            <td class="text-center"></td>
-            <td class="text-center"></td>
-          </tr>
+
+          <!-- Dias que asistio o falto el alumno -->
+            <tr>
+            <?php $diasSemana = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; ?>
+            <?php foreach ($diasSemana as $dia) { ?>
+              <td class='text-center'>
+
+                <?php
+                  if(isset($asistenciaAlumno[$dia])){
+                    foreach($asistenciaAlumno[$dia] as $fecha => $estadoAsistencia){
+                      // echo $fecha . " " . $estadoAsistencia . "<br>";
+
+                      $newFormatDate = date_create($fecha);
+                      $nFecha = date_format($newFormatDate, 'd');
+
+                      if($estadoAsistencia == 'asistio'){
+                        // echo $fecha . " *" . "<br>";
+                        echo $nFecha . " <i class='fa-solid fa-check'></i> " . $estadoAsistencia . "<br>";
+                      } else {
+                        // echo $fecha . " -" . "<br>";
+                        echo $nFecha . " <i class='fa-solid fa-xmark'></i> " . $estadoAsistencia . "<br>";
+                      }
+                    }
+                  }
+                ?>
+
+              </td>
+            <?php } ?>
+            </tr>
 
           </tbody>
 
