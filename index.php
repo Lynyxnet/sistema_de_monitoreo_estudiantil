@@ -31,6 +31,11 @@
       .space {
         margin-top: 9px;
       }
+
+      body{
+        background-image: url("imgs/students.jpg");
+        background-size: cover;
+      }
       
     </style>
     

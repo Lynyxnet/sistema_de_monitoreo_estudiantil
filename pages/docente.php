@@ -20,6 +20,45 @@ $stmt->execute([':idusuario' => $id_usuario]);
 // $pages = $stmt->fetchAll();
 $pages = $stmt->fetchAll();
 
+// ELIMINAR MATERIA
+if (!empty($_POST['BorrarMateriasId'])) {
+  $BorrarMateriaId = $_POST['BorrarMateriasId'];
+  $id_usuario = $_SESSION['id_usuario']; // Asegúrate de que id_usuario esté definido en la sesión
+
+  foreach ($BorrarMateriaId as $idMateriaToDelete) {
+      // Obtener los idMateriaDia asociados a la materia
+      $query_get_materia_dia = "SELECT idMateriaDia FROM materia_dia WHERE idMateria = :id_materia";
+      $stmt_get_materia_dia = $conn->prepare($query_get_materia_dia);
+      $stmt_get_materia_dia->execute([':id_materia' => $idMateriaToDelete]);
+      $materia_dia_ids = $stmt_get_materia_dia->fetchAll(PDO::FETCH_COLUMN, 0);
+
+      // Eliminar registros de asistencias asociados a idMateriaDia
+      foreach ($materia_dia_ids as $idMateriaDia) {
+          $query_delete_asistencias = "DELETE FROM asistencias WHERE idMateriaDia = :id_materia_dia";
+          $stmt_delete_asistencias = $conn->prepare($query_delete_asistencias);
+          $stmt_delete_asistencias->execute([':id_materia_dia' => $idMateriaDia]);
+      }
+
+      // Eliminar registros de materia_dia
+      $query_delete_dia = "DELETE FROM materia_dia WHERE idMateria = :id_materia";
+      $stmt_delete_dia = $conn->prepare($query_delete_dia);
+      $stmt_delete_dia->execute([':id_materia' => $idMateriaToDelete]);
+
+      // Eliminar registros de materia_alumno
+      $query_delete_alumno = "DELETE FROM materia_alumno WHERE idMateria = :id_materia";
+      $stmt_delete_alumno = $conn->prepare($query_delete_alumno);
+      $stmt_delete_alumno->execute([':id_materia' => $idMateriaToDelete]);
+
+      // Eliminar registros de materia
+      $query_delete_materia = "DELETE FROM materia WHERE idMateria = :id_materia AND idUsuario = :id_usuario";
+      $stmt_delete_materia = $conn->prepare($query_delete_materia);
+      $stmt_delete_materia->execute([':id_materia' => $idMateriaToDelete, ':id_usuario' => $id_usuario]);
+  }
+
+  echo "<script>alert('Materia eliminada'); window.location.href='docente.php';</script>";
+
+}
+
 //Alert box - Mensajes en pantalla de termino de una tarea realizada
 if(isset($_SESSION['mensajes'])){
   $mensajes = $_SESSION['mensajes']; //Obtiene los mensajes de la sesion
@@ -103,19 +142,27 @@ if(isset($_SESSION['mensajes'])){
             
             <div class="row">
 
+              
 
               <?php foreach ($pages as $page): ?>
                 <div class="col-2">
+                
                   <a href="ver_clase.php?id=<?php echo $page['idMateria']; ?>" class="card-link">
+                  <form action="#" method="post">
                     <div class="card custom-card mb-3">
-                      <img class="card-img-top">
                       <div class="card-body">
-                        <h6 class="card-title text-center"> <?php echo $page['nombreMateria']; ?> </h6>
+                        <div>
+                          <h6 class="card-title text-center"> <?php echo $page['nombreMateria']; ?> </h6>
+                          <input type="hidden" name="echo $page['idMateria'];">
+                          <button type="submit" class="btn btn-sm btn-outline-primary" style="position: absolute; top: 65px; right: 5px; font-size: 10px;" name="BorrarMateriasId[]" value="<?php echo $page['idMateria']; ?>"> Borrar </button>
+                        </div>
                       </div>
                     </div>
                   </a>
                 </div>
               <?php endforeach; ?>
+
+              </form>
               
             </div>
 
@@ -229,6 +276,9 @@ if(isset($_SESSION['mensajes'])){
         </div>
     </div>
 </div>
+
+<!-- Modal - Perfil docente -->
+ 
 
 </main> <!--- Fin del main --->
 

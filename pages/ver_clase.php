@@ -764,6 +764,8 @@ if(isset($mensajes)){
 
 <!-- Sub-modal - Editar los datos del alumno -->
 
+<!-- Modal - Perfil docente -->
+
 <!-- Sub-modal - Agregar alumno a la lista de asistencia -->
 <div class="modal fade" id="agregarAlumno" role="dialog">
   <div class="modal-dialog modal-dialog-centered" style="width: 600px;">
