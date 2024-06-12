@@ -234,15 +234,16 @@ if(!empty($_POST['enviar'])){
         // echo $MatriculasF;
       
         $query_findings = "SELECT 
-                          usuarios.matricula,
-                          usuarios.idUsuario,
-                          materia_dia.idMateria,
-                          materia_dia.fecha,
-                          asistencias.asistencia
-                         FROM asistencias
-                         JOIN usuarios ON asistencias.idUsuario = usuarios.idUsuario
-                         JOIN materia_dia ON asistencias.idMateriaDia = materia_dia.idMateriaDia
-                         WHERE usuarios.matricula = :matricula AND materia_dia.idMateria = :materia AND materia_dia.fecha = :fecha";
+                            usuarios.matricula,
+                            usuarios.idUsuario,
+                            materia_dia.idMateria,
+                            materia_dia.fecha,
+                            materia_dia.idMateriaDia,
+                            asistencias.asistencia
+                          FROM asistencias
+                          JOIN usuarios ON asistencias.idUsuario = usuarios.idUsuario
+                          JOIN materia_dia ON asistencias.idMateriaDia = materia_dia.idMateriaDia
+                          WHERE usuarios.matricula = :matricula AND materia_dia.idMateria = :materia AND materia_dia.fecha = :fecha";
         $stmt_findings = $conn->prepare($query_findings);
         $stmt_findings->execute([':matricula' => $MatriculasF, 'materia' => $page_id, ':fecha' => $fecha_seleccionada]);
         $Absences = $stmt_findings->fetchAll(PDO::FETCH_ASSOC);
@@ -253,22 +254,26 @@ if(!empty($_POST['enviar'])){
             $asistencia = $Absence['asistencia'];
             $matricula = $Absence['matricula'];
             $idUsuarioUpdate = $Absence['idUsuario'];
+            $id_fecha_seleccionada = $Absence['idMateriaDia'];
 
             if($asistencia == "asistio"){
               $success = 3;
-              // echo "Asistio: " . $id_usuario . " " . $matricula . "<br>";
+              //echo "Asistio: " . $id_usuario . " " . $matricula . "<br>";
             } elseif($asistencia == "falto") {
-              // echo "No asistio " . $matricula . "<br>";
+              //echo "No asistio " . $id_usuario . " " . $matricula . "<br>";
 
               $query_update = "UPDATE
                                   asistencias
                                SET 
                                   asistencia = :asistencia
                                WHERE 
-                                  idUsuario = :id_usuario";
+                                  idUsuario = :id_usuario 
+                               AND
+                                  idMateriaDia = :id_materia_dia
+                               ";
               $stmt_update = $conn->prepare($query_update);
-              $stmt_update->execute(['asistencia' => 'asistio', 'id_usuario' => $idUsuarioUpdate]);
-
+              $stmt_update->execute([':asistencia' => 'asistio', ':id_usuario' => $idUsuarioUpdate, ':id_materia_dia' => $id_fecha_seleccionada]);
+             
               $success = 4;
             }
             
@@ -278,13 +283,13 @@ if(!empty($_POST['enviar'])){
       }
 
       if($success == 3){
-        $mensajes[] = "Ya tiene asistencia. Escoge otro diferente";
+          $mensajes[] = "Ya tiene asistencia. Escoge otro diferente";
         } elseif($success == 4){
-        $mensajes[] = "La falta fue actualizada";
+          $mensajes[] = "La falta fue actualizada";
       }
       
     } else {
-      $mensajes[] = "No hay datos enviados para actualizar.";
+        $mensajes[] = "No hay datos enviados para actualizar.";
     }
     
   }
@@ -312,7 +317,7 @@ if(!empty($asistencias)){
 
   //Guardar el un array asociativo la matricula y fecha
   foreach ($asistencias as $asistencia) {
-  $asistenciaPorMatricula[$asistencia['matricula']][$asistencia['fecha']] = $asistencia['asistencia'];
+    $asistenciaPorMatricula[$asistencia['matricula']][$asistencia['fecha']] = $asistencia['asistencia'];
   }
 
   // Calcular total de asistencias y faltas por matrícula
