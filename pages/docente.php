@@ -1,6 +1,7 @@
 <?php
 
 include_once "../db/conexion_pdo.php";
+
 session_start();
 //no olvidar el dato "estado" para eliminar un dato, pero queda archivado por si queremos restaurarlo
 // print_r($_SESSION);
@@ -55,7 +56,8 @@ if (!empty($_POST['BorrarMateriasId'])) {
       $stmt_delete_materia->execute([':id_materia' => $idMateriaToDelete, ':id_usuario' => $id_usuario]);
   }
 
-  echo "<script>alert('Materia eliminada'); window.location.href='docente.php';</script>";
+  $mensajes[] = "Materia eliminada";
+  // echo "<script>alert('Materia eliminada'); window.location.href='docente.php';</script>";
 
 }
 
@@ -86,7 +88,6 @@ if(isset($_SESSION['mensajes'])){
     <script src="../js/limpiarDatosDocente.js"></script>
     <script src="../js/OcultarAlertBox.js"></script>
     <link rel="stylesheet" href="../css/docente.css">
-
 </head>
 
 <body>
@@ -123,12 +124,12 @@ if(isset($_SESSION['mensajes'])){
     <div class="row space_d" style="background-color: #;">
 
       <!-- 1/2 columna -->
-      <div class="col-1" style="margin-left: 10px;">
+      <div class="col-1" style="margin-left: 10px; background-color: red;">
         <div class="row">
           <div class="col">
             <button type="button" class="btn btn-primary mb-2 small-column_d">Home</button>
             <button type="button" class="btn btn-primary btn-sm mb-2 small-column_d" data-bs-toggle="modal" data-bs-target="#crearClase">Crear clase</button>
-            <button type="button" class="btn btn-primary mb-2 small-column_d">Reportes</button>
+            <button type="button" class="btn btn-primary mb-2 small-column_d" data-bs-toggle="modal" data-bs-target="#reportes">Reportes</button>
             <button type="button" class="btn btn-primary btn-sm mb-2 small-column_d text-center">Justificantes</button>
           </div>
         </div>
@@ -278,7 +279,111 @@ if(isset($_SESSION['mensajes'])){
 </div>
 
 <!-- Modal - Perfil docente -->
- 
+
+<!-- Modal - Reportes -->
+
+<!-- Modal - Justificantes -->
+<div class="modal fade" id="reportes" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content -->
+        <div class="modal-content">
+          
+          <!-- Modal-header -->
+          <div class="modal-header" style="padding:20px 50px;">
+            <h4><span>Estadistica</span></h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+        <form action="crear_clase.php" method="post" enctype="multipart/form-data">
+            <div class="row">
+              
+              <div class="col-12">
+                <input type="text" class="form-control" id="nombre" name="nombre" readonly placeholder="<?php echo $_SESSION['nombre'] . " " . $_SESSION['apellidoPaterno'] . " " . $_SESSION['apellidoMaterno']; ?>">
+              </div>
+              
+              <div class="space col-12">
+                <input type="text" class="form-control" id="asignatura" name="asignatura" pattern="[a-zA-Z]+(\s+[a-zA-Z]+)*" placeholder="Asignatura" required>
+              </div>
+              
+              <div class="space col-12">
+                <input type="number" class="form-control" id="semestre" name="semestre" min="1" max="12" required placeholder="Semestre">
+              </div>
+              
+              <!-- Dias (lunes, martes, miercoles, jueves, viernes, sabado) -->
+              <div class="form-group space">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <label for="">Dias</label>
+                  </div>
+                <div class="col">
+                  <div class="form-inline">
+                    <div class="form-check form-check-inline">
+                      <input type="checkbox" class="form-check-input" id="checkbox1" name="dias[]" value="Monday">
+                      <label class="form-check-label" for="checkbox1">L</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                      <input type="checkbox" class="form-check-input" id="checkbox2" name="dias[]" value="Tuesday">
+                      <label class="form-check-label" for="checkbox2">M</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="checkbox3" name="dias[]" value="Wednesday">
+                        <label class="form-check-label" for="checkbox3">M</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="checkbox4" name="dias[]" value="Thursday">
+                        <label class="form-check-label" for="checkbox4">J</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                        <input type="checkbox" class="form-check-input" id="checkbox5" name="dias[]" value="Friday">
+                        <label class="form-check-label" for="checkbox5">V</label>
+                    </div>
+
+                    <div class="form-check form-check-inline">
+                      <input type="checkbox" class="form-check-input" id="checkbox6" name="dias[]" value="Saturday">
+                      <label class="form-check-label" for="checkbox6">S</label>
+                    </div>
+                  </div>
+                </div>
+                </div>
+              </div>
+
+              <div class="row space align-items-center">
+                <div class="col-md-2">
+                  <label for="diasInicioFin">Duracion</label>
+                </div>
+                <div class="col-md-5">
+                  <input type="date" id="diasInicio" class="form-control" name="fechaInicio" placeholder="Fecha inicio">
+                </div>
+                <div class="col-md-5">
+                  <input type="date" id="diasFinal" class="form-control" name="fechaFinal" placeholder="Fecha final">
+                </div>
+              </div>
+              
+              <div class="space col-12" style="margin-bottom:15px">
+                <input type="file" id="miArchivo" name="archivoExcel" class="form-control form-control-file" accept=".xls,.xlsx">
+              </div>
+          
+            
+            </div>
+          </div>
+          
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" onclick="limpiarDatos()" class="btn btn-secondary">Limpiar</button>
+            <button type="submit" id="submit" name="submit" class="btn btn-success">Crear</button>
+          </div>
+
+        </form>
+
+        </div>
+    </div>
+</div>
 
 </main> <!--- Fin del main --->
 

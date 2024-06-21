@@ -518,8 +518,7 @@ if(isset($mensajes)){
     <div class="col-1 space">
         <div class="row">
           <div class="col">
-            <button type="button" class="btn btn-outline-success mb-2 small-column"><a href="docente.php">Home</a></button>
-            <button type="button" class="btn btn-outline-success mb-2 small-column"><a href="docente.php">Cursos</a></button>
+            <button type="button" class="btn btn-outline-success mb-2 small-column"><a href="docente.php">Clases</a></button>
             <button type="button" class="btn btn-outline-success mb-2 small-column">Reportes</button>
           </div>
         </div>
