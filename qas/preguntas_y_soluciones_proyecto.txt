@@ -30,5 +30,5 @@ R: dirigite a la ruta xampp/php/php.ini > busca php.ini > abre el archivo php.in
    guardalo y dentro de tu proyecto aparecera un archivo llamado "helloworld.xlsx", 
    abrelo de forma normal, y listo se abre el excel con un "Hello World!"
 
-3. Error instaling extension "Fatal error: Uncaught Error: Class "ZipArchive" not found"
+4. Error instaling extension "Fatal error: Uncaught Error: Class "ZipArchive" not found"
 R: abrir el archivo php.ini, quitar ";" de la linea "extension=zip", guardar, y reiniciar xampp
