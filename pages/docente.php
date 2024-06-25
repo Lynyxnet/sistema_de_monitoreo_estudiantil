@@ -124,7 +124,7 @@ if(isset($_SESSION['mensajes'])){
     <div class="row space_d" style="background-color: #;">
 
       <!-- 1/2 columna -->
-      <div class="col-1" style="margin-left: 10px; background-color: red;">
+      <div class="col-1" style="margin-left: 10px;git ">
         <div class="row">
           <div class="col">
             <button type="button" class="btn btn-primary mb-2 small-column_d">Home</button>
